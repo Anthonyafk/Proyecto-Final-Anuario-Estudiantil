@@ -31,7 +31,8 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
-    'modulos' ,
+    'anuario' ,
+    'app' ,
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -50,7 +51,7 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
-ROOT_URLCONF = 'APP.urls'
+ROOT_URLCONF = 'anuario.urls'
 
 TEMPLATES = [
     {
@@ -68,7 +69,7 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = 'APP.wsgi.application'
+WSGI_APPLICATION = 'anuario.wsgi.application'
 
 
 # Database
@@ -76,10 +77,10 @@ WSGI_APPLICATION = 'APP.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'anuario',
+    'ENGINE': 'django.db.backends.postgresql',
+    'NAME': 'anuario',
 	'USER': 'postgres',
-	'PASSWORD': '',
+	'PASSWORD': '117007',
 	'HOST': 'localhost',
 	'PORT': '5432',
     }
