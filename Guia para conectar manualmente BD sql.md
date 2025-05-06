@@ -124,5 +124,6 @@ y ya se debería de ver listadas las tablas restauradas.
 
 Desde fuera de docker se puede hacer con:
 
+```
 docker exec -it <ID del contenedor> dropdb -U postgres <nombre de la BD>
-
+```

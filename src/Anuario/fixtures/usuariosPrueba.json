@@ -18,7 +18,7 @@
         "fields": {
             "nombre": "🐧 Club Penguin 🐧",
             "descripcion": "Grupo para los pingüinos xd",
-            "foto_portada": "https://ichef.bbci.co.uk/ace/ws/640/cpsprodpb/A435/production/_112373024_penguinj1.png.webp"
+            "foto_portada": "images/club_penguin.png.webp"
         }
     },
     {
@@ -40,7 +40,8 @@
             "fecha_creacion": "2024-03-10",
             "hora_creacion": "09:15:00",
             "descripcion": "Inscripciones abiertas para el concurso de quien tiene el mejor avatar de Club Penguin <3",
-            "imagen": "https://www.youtube.com/watch?v=dQw4w9WgXcQ"
+            "imagen": "images/Patrick.jpeg",
+            "video_url": "https://www.youtube.com/watch?v=dQw4w9WgXcQ"
         }
     },
     {
@@ -55,8 +56,8 @@
         "model": "app.Perfil",
         "pk": 1,
         "fields": {
-            "foto_perfil": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ2DoCtAH8ousHZ4lYL2MtzkxsVW8s5AD2qKg&s",
-            "foto_portada": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSDWOChyiAD2nY6YbjIr2epEQ7wHUDBOPsIJg&s",
+            "foto_perfil": "images/gatoMem.jpeg",
+            "foto_portada": "images/pelaoXd.jpeg",
             "biografia": "Apasionado de las tunas y el fentanilo <3"
         }
     },

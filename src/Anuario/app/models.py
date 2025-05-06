@@ -89,6 +89,7 @@ class Publicacion(models.Model):
     hora_creacion = models.TimeField()
     descripcion = models.TextField(blank=True)
     imagen = models.TextField(blank=True)
+    video_url = models.URLField(blank=True, null=True) # Atributo/campo de prueba para almacenar la URL de un video
 
 
 class Nominacion(models.Model):

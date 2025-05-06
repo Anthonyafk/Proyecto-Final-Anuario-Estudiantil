@@ -1,3 +1,4 @@
+{% load static %}
 <!doctype html>
 <html lang="es">
 <head>
@@ -17,20 +18,25 @@
       </div>
       <div class="card-body">
         <div class="table-responsive">
-          <table class="table table-striped table-hover">
+          <table class="table table-striped table-hover align-middle">
             <thead>
               <tr>
+                <th>Foto</th>
                 <th>N° Cuenta</th>
                 <th>Nombre</th>
                 <th>Apellidos</th>
                 <th>Correo</th>
                 <th>Usuario</th>
-                <th>Es Admin</th>
+                <th>Admin</th>
               </tr>
             </thead>
             <tbody>
               {% for usuario in usuarios %}
               <tr>
+                <td>
+                  <img src="{% static usuario.tener.idPerfil.foto_perfil %}"
+                       alt="Perfil" class="rounded-circle" width="40">
+                </td>
                 <td>{{ usuario.numCuenta }}</td>
                 <td>{{ usuario.nombre }}</td>
                 <td>{{ usuario.primer_apellido }} {{ usuario.segundo_apellido }}</td>
@@ -42,6 +48,10 @@
             </tbody>
           </table>
         </div>
+        <div class="text-center mt-3">
+          <!-- ejemplo de imagen fija bajo usuarios -->
+          <img src="{% static 'images/Patrick.jpeg' %}" alt="Ejemplo" width="120">
+        </div>
       </div>
     </div>
 
@@ -51,11 +61,20 @@
         <h2>Grupos</h2>
       </div>
       <div class="card-body">
-        <ul class="list-group">
+        <div class="row">
           {% for grupo in grupos %}
-          <li class="list-group-item">{{ grupo.nombre }}</li>
+          <div class="col-md-4 mb-3">
+            <div class="card h-100">
+              <img src="{% static grupo.foto_portada %}"
+                   class="card-img-top" alt="{{ grupo.nombre }}">
+              <div class="card-body">
+                <h5 class="card-title">{{ grupo.nombre }}</h5>
+                <p class="card-text">{{ grupo.descripcion }}</p>
+              </div>
+            </div>
+          </div>
           {% endfor %}
-        </ul>
+        </div>
       </div>
     </div>
 
@@ -67,10 +86,14 @@
       <div class="card-body">
         <ul class="list-group">
           {% for comentario in comentarios %}
-          <li class="list-group-item">
-            <strong>{{ comentario.numCuenta.nombre }}:</strong> 
-            {{ comentario.contenido|truncatechars:50 }}
-            <small class="text-muted">{{ comentario.fecha_creacion }}</small>
+          <li class="list-group-item d-flex align-items-start">
+            <img src="{% static comentario.idPerfil.foto_perfil %}"
+                 alt="Perfil" width="30" class="rounded-circle me-2">
+            <div>
+              <strong>{{ comentario.numCuenta.nombre }}:</strong>
+              {{ comentario.contenido|truncatechars:50 }}
+              <br><small class="text-muted">{{ comentario.fecha_creacion }}</small>
+            </div>
           </li>
           {% endfor %}
         </ul>
@@ -80,17 +103,28 @@
     <!-- Sección de Publicaciones -->
     <div class="card mb-4 shadow">
       <div class="card-header bg-info text-white">
-        <h2>Publicaciones</h2>
+      <h2>Publicaciones</h2>
       </div>
       <div class="card-body">
-        <ul class="list-group">
-          {% for publicacion in publicaciones %}
-          <li class="list-group-item">
-            <strong>{{ publicacion.descripcion|truncatechars:30 }}</strong>
-            <small class="text-muted">{{ publicacion.fecha_creacion }}</small>
-          </li>
-          {% endfor %}
-        </ul>
+      <ul class="list-group">
+        {% for publicacion in publicaciones %}
+        <li class="list-group-item d-flex flex-column flex-md-row align-items-center">
+        <div class="me-md-4 text-center">
+          <a href="{{ publicacion.video_url }}" target="_blank">
+          <img src="{% static publicacion.imagen %}"
+             alt="Video" width="250" class="img-fluid rounded mb-2">
+          </a>
+          <div>
+          <small class="text-muted">Haz click en la imagen</small>
+          </div>
+        </div>
+        <div class="text-center text-md-start">
+          <p class="mb-1"><strong>{{ publicacion.descripcion }}</strong></p>
+          <small class="text-muted">{{ publicacion.fecha_creacion }}</small>
+        </div>
+        </li>
+        {% endfor %}
+      </ul>
       </div>
     </div>
 
@@ -103,7 +137,7 @@
         <ul class="list-group">
           {% for nominacion in nominaciones %}
           <li class="list-group-item">
-            <strong>{{ nominacion.categoria }}:</strong> 
+            <strong>{{ nominacion.categoria }}:</strong>
             {{ nominacion.descripcion|default:"Sin descripción" }}
           </li>
           {% endfor %}
