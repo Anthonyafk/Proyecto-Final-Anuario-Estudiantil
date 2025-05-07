@@ -55,18 +55,40 @@
       </div>
     </div>
 
+        <!-- Sección de Perfiles -->
+      <div class="card mb-4 shadow">
+        <div class="card-header bg-secondary text-white">
+          <h2>Perfiles</h2>
+        </div>
+        <div class="card-body">
+          <div class="row justify-content-center"> <!-- Clase añadida -->
+            {% for perfil in perfiles %}
+            <div class="col-md-4 mb-3">
+              <div class="card h-100">
+                <img src="{% static perfil.foto_portada %}" class="card-img-top" alt="Portada">
+                <div class="card-body text-center">
+                  <img src="{% static perfil.foto_perfil %}" alt="Perfil" class="rounded-circle mb-2 d-block mx-auto" width="80">
+                  <p class="card-text">{{ perfil.biografia }}</p>
+                </div>
+              </div>
+            </div>
+            {% endfor %}
+          </div>
+        </div>
+      </div>
+
     <!-- Sección de Grupos -->
     <div class="card mb-4 shadow">
       <div class="card-header bg-success text-white">
         <h2>Grupos</h2>
       </div>
       <div class="card-body">
-        <div class="row">
+        <div class="row justify-content-center"> <!-- Clase añadida -->
           {% for grupo in grupos %}
           <div class="col-md-4 mb-3">
             <div class="card h-100">
-              <img src="{% static grupo.foto_portada %}"
-                   class="card-img-top" alt="{{ grupo.nombre }}">
+              <img src="{% static grupo.foto_portada %}" 
+              class="card-img-top d-block mx-auto" alt="{{ grupo.nombre }}">
               <div class="card-body">
                 <h5 class="card-title">{{ grupo.nombre }}</h5>
                 <p class="card-text">{{ grupo.descripcion }}</p>
