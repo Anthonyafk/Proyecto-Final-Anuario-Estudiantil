@@ -18,11 +18,13 @@ conda activate `nombre del env`
 
 ## 🐳 Base de datos 
 
-Si ya tienes PostgreSQL instalado, crea una base llamada `anuario` y ajusta las credenciales en `.env` o en `settings.py`. Para mas información se puede consultar [Guía para conectar manualmente BD SQL](Guia%20para%20conectar%20manualmente%20BD%20sql.md)
+Si ya tienes PostgreSQL instalado, crea una base llamada `anuario` o con el nombre que prefieras y ajusta las credenciales que tienes de tu BD en `settings.py` dentro de la carpeta `anuario`. Para mas información: [Guía para conectar manualmente BD SQL](Guia%20para%20conectar%20manualmente%20BD%20sql.md)
+
+![Sección a modificar para la BD local](image.png)
 
 ##  Guia rapida para hacer las migraciones hacia nuestra BD de postgresql 
 
-Estando en la misma altura que `manage.py`
+Estando en la misma altura que `manage.py` el cual se encuentra en `src/Anuario/manage.py`
 
 1. Genera y aplica migraciones:
 
