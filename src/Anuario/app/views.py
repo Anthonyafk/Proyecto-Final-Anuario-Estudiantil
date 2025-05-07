@@ -12,3 +12,5 @@ def index(request):
     }
     return render(request, "index.html", contextosinpretexto)
 
+def home(request):
+    return render(request, "home.html")

@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.5/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-SgOJa3DmI69IUzQ2PVdRZhwQ+dy64/BUtbMJw1MZ8t5HZApcHrRKUc4W0kG879m7" crossorigin="anonymous">    
+</head>
+<body class="d-flex flex-column min-vh-100">
+  <!-- Navbar -->
+  <nav class="navbar border-bottom shadow-sm px-4 py-2">
+    <div class="container-fluid d-flex justify-content-between align-items-center">
+      <!-- Logo / Título -->
+      <a class="navbar-brand fw-bold" href="#">NentBook</a>
+
+      <!-- Sección derecha -->
+      <div class="d-flex align-items-center gap-3">
+        <!-- Enlace -->
+        <a class="text-decoration-none text-dark" href="#">Ingresar a un Grupo</a>
+
+        <!-- Ícono de usuario -->
+        <button class="btn btn-outline-secondary rounded-circle d-flex align-items-center justify-content-center" style="width: 36px; height: 36px;">
+          <i class="bi bi-person"></i>
+        </button>
+      </div>
+    </div>
+  </nav>
+    {% block content %}
+    {% endblock %}
+
+    <!-- Footer --> 
+<footer class="border-top py-4">
+  <div class="container">
+    <div class="row text-center text-md-start align-items-center">
+      <div class="col-md-4 mb-3 mb-md-0">
+        <a href="#" class="text-decoration-none text-dark">Sobre este sitio</a>
+      </div>
+      <div class="col-md-4 mb-3 mb-md-0 text-center">
+        <a href="#" class="text-decoration-none text-dark">Términos y condiciones</a>
+      </div>
+      <div class="col-md-4 text-md-end">
+        <a href="#" class="text-dark me-3"><i class="bi bi-twitter"></i></a>
+        <a href="#" class="text-dark me-3"><i class="bi bi-instagram"></i></a>
+        <a href="#" class="text-dark me-3"><i class="bi bi-facebook"></i></a>
+        <a href="#" class="text-dark me-3"><i class="bi bi-youtube"></i></a>
+        <a href="#" class="text-dark"><i class="bi bi-discord"></i></a>
+      </div>
+    </div>
+  </div>
+</footer>
+
+    <!-- Bootstrap Icons CDN -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js" integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.5/dist/js/bootstrap.min.js" integrity="sha384-VQqxDN0EQCkWoxt/0vsQvZswzTHUVOImccYmSyhJTp7kGtPed0Qcx8rK9h9YEgx+" crossorigin="anonymous"></script>
+</body>
+</html>
