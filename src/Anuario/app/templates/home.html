@@ -1,8 +1,13 @@
 {% extends 'base.html' %}
 {% block content %}
-<div class="container flex-grow-1">
-	<div class="text-success">
-		<h1>Esto es un Home</h1>
+<div class="flex-grow-1">
+	<header class="masthead" style="">
+		<div class="container">
+			<div class="masthead-subheading text-uppercase">Tus Grupos</div>
+		</div>
+	</header>
+	<div class="container">
+		{% include 'common/CardGrupo.html' %}
 	</div>
 </div>
 {% endblock %}

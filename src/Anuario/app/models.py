@@ -58,13 +58,11 @@ class Usuario(models.Model):
         self.full_clean()
         super().save(*args, **kwargs)
 
-
 class Perfil(models.Model):
     idPerfil = models.AutoField(primary_key=True)
     foto_perfil = models.TextField(blank=True)
     foto_portada = models.TextField(blank=True)
     biografia = models.TextField(blank=True)
-
 
 class Grupo(models.Model):
     codigo = models.AutoField(primary_key=True)
