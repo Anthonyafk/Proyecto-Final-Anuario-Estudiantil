@@ -24,9 +24,11 @@ conda env remove --name `nombre del env`
 
 ## 🐳 Base de datos 
 
-Si ya tienes PostgreSQL instalado, crea una base llamada `anuario` o con el nombre que prefieras y ajusta las credenciales que tienes de tu BD en `settings.py` dentro de la carpeta `anuario`. Tambien esta esta otra guia para mas información: [Guía para conectar manualmente BD SQL](Guia%20para%20conectar%20manualmente%20BD%20sql.md)
+Si ya tienes PostgreSQL, puedes crear una base llamada `anuario` o con el nombre que prefieras y ajusta las credenciales que tienes de tu BD en `settings.py` dentro de la carpeta `anuario`. Tambien esta esta otra guia para mas información: [Guía para conectar manualmente BD SQL](Guia%20para%20conectar%20manualmente%20BD%20sql.md)
 
 ![Sección a modificar para la BD local](image.png)
+
+**Es importante asegurarse que el contenedor de la BD este activo antes de ejecutar el servidor**
 
 ##  Guia rapida para hacer las migraciones hacia nuestra BD de postgresql 
 
