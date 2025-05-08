@@ -12,8 +12,14 @@
 Esto principalmente es para que todos tengamos las mismas dependecias y que cada uno no tenga que ir descargando una a una las dependencias que tiene el proyecto xd.
 
 ```bash
-conda env create -f entorno.yml --name `nombre del env`
+conda env create --name `nombre del env`
 conda activate `nombre del env`
+```
+
+*En dado caso de que necesites eliminar el entorno:*
+
+```bash
+conda env remove --name `nombre del env`
 ```
 
 ## 🐳 Base de datos 
