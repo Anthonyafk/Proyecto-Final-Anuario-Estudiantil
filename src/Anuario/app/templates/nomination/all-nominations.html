@@ -1,0 +1,13 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="flex-grow-1">
+	<div class="container py-4">
+		<h1>Nominaciones</h1>
+		<div class="container">
+			{%for nominacion in nominaciones %}
+				{% include 'common/CardNominacion.html' %}
+			{% endfor %}
+		</div>
+	</div>
+</div>
+{% endblock %}

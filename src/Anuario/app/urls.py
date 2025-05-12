@@ -3,6 +3,8 @@ from django.views.generic.base import TemplateView  # new
 from . import views
 
 urlpatterns = [
+    path("nominaciones/", views.nominaciones, name="nominaciones"),
+    path("verNominacion/<str:idNominacion>", views.verNominacion, name="verNominacion")
     #path("551123012/", views.index, name="index"),
     path("accounts/signup/", views.signup, name="signup"),
     path("accounts/", include("django.contrib.auth.urls")),  # new
