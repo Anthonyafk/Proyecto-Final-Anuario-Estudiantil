@@ -1,0 +1,24 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="flex-grow-1">
+	<div style="box-sizing: border-box;  display: flex; justify-content: space-between; align-items: center; padding: 2%;">
+		<h1>{{nominacion.categoria}}</h1>
+		<form action="" method="POST">
+      {% csrf_token %}
+      <div style="display: flex; justify-content: space-between;">
+          <label for="nombre" style="margin-right: 15px; margin-left: 15px;">Buscar Estudiante: </label>
+          {{form.nombre}}
+          <button type="submit" class="btn btn-primary" style="margin-left: 30px;"> Buscar </button>
+      </div>
+    </form>
+		<button type="button" class="btn btn-success" {{desabilitar}}>Postularse</button>
+	</div>
+	
+	<div class="container">
+	    <p style="color: crimson;">{{dato}}</p>
+			{%for inscrito in inscritos %}
+				{% include 'common/CardPostulados.html' %}
+			{% endfor %}
+		</div>
+</div>
+{% endblock %}
