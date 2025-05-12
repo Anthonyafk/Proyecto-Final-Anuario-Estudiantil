@@ -12,15 +12,23 @@
 Esto principalmente es para que todos tengamos las mismas dependecias y que cada uno no tenga que ir descargando una a una las dependencias que tiene el proyecto xd.
 
 ```bash
-conda env create -f entorno.yml --name `nombre del env`
+conda env create --name `nombre del env`
 conda activate `nombre del env`
+```
+
+*En dado caso de que necesites eliminar el entorno:*
+
+```bash
+conda env remove --name `nombre del env`
 ```
 
 ## 🐳 Base de datos 
 
-Si ya tienes PostgreSQL instalado, crea una base llamada `anuario` o con el nombre que prefieras y ajusta las credenciales que tienes de tu BD en `settings.py` dentro de la carpeta `anuario`. Tambien esta esta otra guia para mas información: [Guía para conectar manualmente BD SQL](Guia%20para%20conectar%20manualmente%20BD%20sql.md)
+Si ya tienes PostgreSQL, puedes crear una base llamada `anuario` o con el nombre que prefieras y ajusta las credenciales que tienes de tu BD en `settings.py` dentro de la carpeta `anuario`. Tambien esta esta otra guia para mas información: [Guía para conectar manualmente BD SQL](Guia%20para%20conectar%20manualmente%20BD%20sql.md)
 
 ![Sección a modificar para la BD local](image.png)
+
+**Es importante asegurarse que el contenedor de la BD este activo antes de ejecutar el servidor**
 
 ##  Guia rapida para hacer las migraciones hacia nuestra BD de postgresql 
 
