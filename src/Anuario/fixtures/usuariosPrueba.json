@@ -1,72 +1,15 @@
 [
     {
         "model": "app.Usuario",
-        "pk": 123456789,
+        "pk": 320124516 ,
         "fields": {
-            "nombre": "Pablo🗿",
-            "primer_apellido": "López",
-            "segundo_apellido": "Doriga",
-            "correoE": "fentanyladdict@ciencias.unam.mx",
-            "nombre_usuario": "FentanylPablo",
-            "contraseña": "pbkdf2_sha256$390000$i4F9GG9qt64ayamuweBxiy$H26AY37PC5tDFKbnm0BnlgMgfBCuQ4kIe5Q0JbZk3Ug=",
+            "nombre": "Joshua",
+            "primer_apellido": "Juárez",
+            "segundo_apellido": "Cruz",
+            "correoE": "joshua-j-c@ciencias.unam.mx",
+            "nombre_usuario": "",
+            "contraseña": "",
             "esAdmin": true
-        }
-    },
-    {
-        "model": "app.Grupo",
-        "pk": 1,
-        "fields": {
-            "nombre": "🐧 Club Penguin 🐧",
-            "descripcion": "Grupo para los pingüinos xd",
-            "foto_portada": "images/club_penguin.png.webp"
-        }
-    },
-    {
-        "model": "app.Comentario",
-        "pk": 1,
-        "fields": {
-            "idPerfil": 1,
-            "numCuenta": 123456789,
-            "contenido": "🗣️🔥 Sigan viendo",
-            "fecha_creacion": "2024-03-15",
-            "hora_creacion": "14:30:00"
-        }
-    },
-    {
-        "model": "app.Publicacion",
-        "pk": 1,
-        "fields": {
-            "numCuenta": 123456789,
-            "fecha_creacion": "2024-03-10",
-            "hora_creacion": "09:15:00",
-            "descripcion": "Inscripciones abiertas para el concurso de quien tiene el mejor avatar de Club Penguin <3",
-            "imagen": "images/JhonFN.jpg",
-            "video_url": "https://www.youtube.com/watch?v=dQw4w9WgXcQ"
-        }
-    },
-    {
-        "model": "app.Nominacion",
-        "pk": 1,
-        "fields": {
-            "categoria": "🔥Mejor funada del año🔥",
-            "descripcion": "Uwu"
-        }
-    },
-    {
-        "model": "app.Perfil",
-        "pk": 1,
-        "fields": {
-            "foto_perfil": "images/gatoMem.jpeg",
-            "foto_portada": "images/pelaoXd.jpeg",
-            "biografia": "Apasionado de las tunas y el fentanilo <3"
-        }
-    },
-    {
-        "model": "app.Tener",
-        "pk": 1,
-        "fields": {
-            "numCuenta": 123456789,
-            "idPerfil": 1
         }
     }
 ]

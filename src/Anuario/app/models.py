@@ -1,15 +1,49 @@
 from django.db import models
 from django.core.validators import RegexValidator
+from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
 import pgtrigger
 
-class Usuario(models.Model):
+class UsuarioManager(BaseUserManager):
+    def _create_user(self, numCuenta, nombre, nombre_usuario, correoE, password, **extra_fields):
+        if not numCuenta:
+            raise ValueError('El número de cuenta es obligatorio.')
+        if not correoE:
+            raise ValueError('El correo es obligatorio')
+        if not nombre_usuario:
+            raise ValueError('El nombre de usuario es obligatorio')
+
+        email = self.normalize_email(correoE)
+        user = self.model(
+            numCuenta=numCuenta,
+            nombre=nombre,
+            nombre_usuario=nombre_usuario,
+            correoE = email,
+            **extra_fields
+        )
+        user.set_password(password)
+        user.save(using=self._db)
+        return user
+
+    def create_user(self, numCuenta=None, nombre=None, nombre_usuario=None, correoE=None, password=None, **extra_fields):
+        extra_fields.setdefault('is_staff', False)
+        extra_fields.setdefault('is_superuser', False)
+        #extra_fields.setdefault('esAdmin', False)
+        return self._create_user(numCuenta, nombre, nombre_usuario, correoE, password, **extra_fields)
+
+    def create_superuser(self, numCuenta=None, nombre=None, nombre_usuario=None, correoE=None, password=None, **extra_fields):
+        extra_fields.setdefault('is_staff', True)
+        extra_fields.setdefault('is_superuser', True)
+        #extra_fields.setdefault('esAdmin', True)
+        return self._create_user(numCuenta, nombre, nombre_usuario, correoE, password, **extra_fields)
+
+class Usuario(AbstractBaseUser, PermissionsMixin):
     numCuenta = models.IntegerField(
         primary_key=True,
         validators=[RegexValidator(r'^\d{1,9}$', 'Debe tener entre 1 y 9 dígitos')]
     )
-    nombre = models.CharField(max_length=50)
-    primer_apellido = models.CharField(max_length=50)
-    segundo_apellido = models.CharField(max_length=50)
+    nombre = models.CharField(max_length=255, blank=True, default=' ')
+    primer_apellido = models.CharField(max_length=50, blank=True, default='')
+    segundo_apellido = models.CharField(max_length=50, blank=True, default='')
     correoE = models.EmailField(
         unique=True,
         max_length=100,
@@ -19,8 +53,15 @@ class Usuario(models.Model):
         )]
     )
     nombre_usuario = models.CharField(unique=True, max_length=50)
-    contraseña = models.CharField(max_length=128)
-    esAdmin = models.BooleanField(default=False)
+    #contraseña = models.CharField(max_length=128, blank=True, default='')
+    #esAdmin = models.BooleanField(default=False)
+    is_active = models.BooleanField(default=True)
+    is_staff = models.BooleanField(default=False)  # Necesario para el admin
+
+    USERNAME_FIELD = 'numCuenta'
+    REQUIRED_FIELDS = ['nombre', 'nombre_usuario', 'correoE']
+    EMAIL_FIELD = 'correoE'
+    objects = UsuarioManager()
 
     class Meta:
         constraints = [
@@ -182,9 +223,7 @@ class Pertenecer(models.Model):
 
 
 class Tener(models.Model):
-    numCuenta = models.OneToOneField(
-        Usuario, primary_key=True, on_delete=models.CASCADE
-    )
+    numCuenta = models.OneToOneField(Usuario, primary_key=True, on_delete=models.CASCADE)
     idPerfil = models.OneToOneField(Perfil, on_delete=models.CASCADE)
 
 
