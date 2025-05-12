@@ -1,13 +1,93 @@
 {% extends 'base.html' %}
+
 {% block content %}
+<head>
+  <title>{% block title %} {% endblock %}</title>
+	<style>
+  header.masthead {
+    height: 20vh;
+    padding-top: 6rem + 4.5rem;
+    padding-bottom: 6rem;
+    text-align: center;
+    font-weight: bold;
+    color: #fff;
+    /*background-image: url("/assets/background.jpeg");*/
+		background: #659FC7;
+    background: linear-gradient(180deg,rgba(101, 159, 199, 1) 0%, rgba(80, 224, 134, 1) 100%);
+		background-repeat: no-repeat;
+    background-attachment: scroll;
+    background-position: center center;
+    background-size: cover;
+
+    .masthead-subheading {
+        font-size: 2.75rem;
+        line-height: 2rem;
+        margin-bottom: 25px;
+    }
+
+    .masthead-heading {
+        font-size: 2.25rem;
+        font-weight: 700;
+        line-height: 2.5rem;
+        margin-bottom: 0.8rem;
+    }
+    
+    
+    @include media-breakpoint-up(md) {
+        header.masthead {
+            padding-top: 12.5rem + 4.5rem;
+            padding-bottom: 12.5rem;
+    
+            .masthead-subheading {
+                font-size: 2.25rem;
+                font-style: italic;
+                line-height: 2.25rem;
+                margin-bottom: 2rem;
+            }
+    
+            .masthead-heading {
+                font-size: 4.5rem;
+                font-weight: 700;
+                line-height: 4.5rem;
+                margin-bottom: 4rem;
+            }
+        }
+    }
+}  
+    .group-container {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 30px;
+      padding: 40px 60px;
+    }
+	</style>
+</head>
 <div class="flex-grow-1">
-	<header class="masthead" style="">
-		<div class="container">
-			<div class="masthead-subheading text-uppercase">Tus Grupos</div>
+  {% if user.is_authenticated %}
+  <header class="masthead" style="">
+		<div class="container py-1">
+			<div class="py-4"></div>
+			<div class="py-4 masthead-heading text-uppercase">Tus Grupos</div>
 		</div>
 	</header>
 	<div class="container">
-		{% include 'common/CardGrupo.html' %}
-	</div>
+    <div class="group-container">
+      {% if grupos %}
+        {% for grupo in grupos %}
+            {% include "common/CardGrupo.html" with grupo=grupo %}
+        {% endfor %}
+      {% else %}
+        <div class="masthead-subheading text-uppercase text-center">No tienes grupos registrados</div>
+      {% endif %}
+    </div>
+    <form action="{% url 'logout' %}" method="post">
+      {% csrf_token %}
+      <button type="submit">Log Out</button>
+    </form>
+  </div>
+  {% else %}
+    <p>No has iniciado sesión</p>
+    <a href="{% url 'login' %}">Log In</a>
+  {% endif %}
 </div>
 {% endblock %}

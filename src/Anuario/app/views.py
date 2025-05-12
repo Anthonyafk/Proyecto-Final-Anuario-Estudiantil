@@ -2,7 +2,9 @@ from django.shortcuts import render, redirect
 from django.contrib import messages
 from .models import Usuario, Grupo, Comentario, Publicacion, Nominacion, Perfil, Tener, Pertenecer, Postular # .... etc.
 from .forms import UsuarioRegistroForm, UsuarioBusquedaNominacion
+from django.contrib.auth import authenticate, login
 from django.db import IntegrityError
+from django.contrib.auth.decorators import login_required
 
 from django.shortcuts import HttpResponse #prueba
 def index(request):
@@ -16,46 +18,35 @@ def index(request):
     }
     return render(request, "index.html", contextosinpretexto)
 
-def registro(request):
+def signup(request):
     form = UsuarioRegistroForm()
-    usuario = None
-    if request.method == "POST":
+    if request.method == 'POST':
         form = UsuarioRegistroForm(request.POST)
         if form.is_valid():
-            num_cuenta = form.cleaned_data['numCuenta']
-
-            try:
-                usuario = Usuario.objects.get(numCuenta=num_cuenta)
-            except Usuario.DoesNotExist:
-                messages.error(request, f"El usuario con número de cuenta {num_cuenta} no existe.")
-                return render(request, 'registration/registration.html', {'form' : form})
-
-            if Tener.objects.filter(numCuenta=num_cuenta).exists():
-                messages.error(request, "Este usuario ya tiene un perfil registrado.")
-                return render(request, 'registration/registration.html', {'form' : form})
-
-            usuario.correoE = form.cleaned_data['correoE']
-            usuario.nombre_usuario = form.cleaned_data['nombre_usuario']
-            usuario.contraseña = form.cleaned_data['contraseña']
+            usuario = form.save()
             usuario.save()
-
+            user = authenticate(username=form.cleaned_data['numCuenta'], password=form.cleaned_data['password1'])
             perfil = Perfil.objects.create(
                 foto_perfil = "",
                 foto_portada = "",
                 biografia = ""
             )
-
-            Tener.objects.create(numCuenta=num_cuenta, idPerfil=perfil.idPerfil)
+            try:
+                Tener.objects.create(numCuenta=usuario, idPerfil=perfil)
+            except:
+                Perfil.objects.filter(idPerfil=perfil.idPerfil).delete()
+            login(request, user)
             messages.success(request, "Registro exitoso")
             return redirect('home')
-    #else:
-    #    form = UsuarioRegistroForm()
+    else:
+        form = UsuarioRegistroForm()
     return render(request, 'registration/registration.html', { 'form' : form })
 
-
+@login_required
 def home(request):
-    #usuario = Usuario.objects.get(pk=id)
-    #print(usuario)
+    #numCuenta= request.GET.get('numCuenta')
+    #usuario = Usuario.objects.get(numCuenta=numCuenta)
+    #grupos =
     return render(request, "home.html")
 
 #Esta funcion esta disponible sii existe al menos un grupo en la vista home

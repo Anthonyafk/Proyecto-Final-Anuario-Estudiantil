@@ -1,0 +1,54 @@
+{% extends 'base.html' %}
+
+{% block content %}
+{% load static %}
+{% load widget_tweaks %}
+<head>
+  <title>{% block title  %}Iniciar Sesión{% endblock %}</title>
+	<script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+  <style>
+    body{
+      background: #659FC7;
+      background: linear-gradient(180deg, rgba(101, 159, 199, 1) 0%, rgba(80, 224, 134, 1) 100%);
+    }
+  </style>
+</head>
+
+<div class="container d-flex justify-content-center align-items-center" style="min-height: 90vh;">
+  <div class="row w-100 rounded-4 shadow" style="background-color: white; padding: 2rem 3rem;">
+    <div class="col-md-6 d-flex justify-content-center align-items-center">
+      <img src="{% static 'images/logo.png' %}" alt="Logo" class="img-fluid" style="max-height: 300px;">
+    </div>
+    <div class="col-md-6">
+      <h3 class="fw-bold mb-4 text-center">Iniciar sesión</h3>
+      {% if messages %}
+        {% for message in messages %}
+          <div class="alert {{ message.tags }} alert-dismissible fade show" role="alert">
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+          </div>
+        {% endfor %}
+      {% endif %}
+      <form method="POST" novalidate>
+        {% csrf_token %}
+        
+        <div class="mb-3 position-relative">
+          <i class="fas fa-user position-absolute top-50 start-0 translate-middle-y ms-3 text-muted"></i>
+          {{ form.username | add_class:"form-control ps-5 rounded-pill bg-light" | attr:"placeholder: Número de cuenta"}}
+        </div>
+
+        <div class="mb-4 position-relative">
+          <i class="fas fa-lock position-absolute top-50 start-0 translate-middle-y ms-3 text-muted"></i>
+          {{ form.password | add_class:"form-control ps-5 rounded-pill bg-light" | attr:"placeholder: Contraseña"}}
+        </div>
+        
+        <button type="submit" class="btn btn-success w-100 rounded-pill py-2 fw-bold mb-3">Entrar</button>
+        <div class="text-center">
+          <a href="{% url 'signup'  %}" class="text-decoration-none text-dark">Crear perfil →</a>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
