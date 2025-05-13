@@ -1,0 +1,37 @@
+{% extends 'base.html' %}
+<!--Muestra en la parte del enlace una pequeña historia para que el usuario
+sepa en que vista se encuentra-->
+{% block title %}Editar Perfil{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="card shadow">
+        <div class="card-header bg-light">
+            <h4>Editar Perfil</h4>
+        </div>
+        <div class="card-body">
+            <form method="post" enctype="multipart/form-data">
+                {% csrf_token %}
+                
+                <div class="mb-3">
+                   <label class="form-label">Foto de perfil</label>
+                     <input type="file" class="form-control" name="foto_perfil" accept="image/*">
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">Foto de portada</label>
+                      <input type="file" class="form-control" name="foto_portada" accept="image/*">
+                </div>
+                
+                <div class="mb-3">
+                    <label class="form-label">{{ form.biografia.label }}</label>
+                    {{ form.biografia }}
+                </div>
+                
+                <button type="submit" class="btn btn-primary">Guardar Cambios</button>
+                <a href="{% url 'perfil' %}" class="btn btn-secondary">Cancelar</a>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

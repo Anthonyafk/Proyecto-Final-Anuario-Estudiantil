@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect
 from django.contrib import messages
 from .models import Usuario, Grupo, Comentario, Publicacion, Nominacion, Perfil, Tener, Pertenecer, Postular # .... etc.
-from .forms import UsuarioRegistroForm, UsuarioBusquedaNominacion
+from .forms import UsuarioRegistroForm, UsuarioBusquedaNominacion, PerfilForm
 from django.contrib.auth import authenticate, login
 from django.db import IntegrityError
 from django.contrib.auth.decorators import login_required
@@ -83,3 +83,47 @@ def verNominacion(request, idNominacion):
         
     
     return render(request, "nomination/nomination.html", {'nominacion':nominacion, 'inscritos':inscritos, 'desabilitar':desabilitar, 'form':form, 'dato':dato})
+
+#Funcion para acceder al perfil del usuario
+def verPerfil(request):
+    # Obtiene el perfil y datos del usuario que inició la sesión
+    try:
+        relacion_tener = Tener.objects.get(numCuenta=request.user)
+        perfil = relacion_tener.idPerfil
+    except Tener.DoesNotExist:
+        # Si no existe el perfil, creamos uno vacío
+        perfil = Perfil.objects.create(
+            foto_perfil="",
+            foto_portada="",
+            biografia=""
+        )
+        Tener.objects.create(numCuenta=request.user, idPerfil=perfil)
+    
+    datos = {
+        'perfil': perfil,
+        'usuario': request.user
+    }
+    return render(request, 'perfil/perfil.html', datos)
+
+# Función para poder editar perfil
+def editar_perfil(request):
+    # Obtener el perfil del usuario actual
+    perfil = request.user.tener.idPerfil
+    
+    if request.method == 'POST':
+        form = PerfilForm(request.POST, request.FILES, instance=perfil)
+        if form.is_valid():
+            form.save()
+            return redirect('perfil')  # Redirige al perfil después de editar
+    else:
+        form = PerfilForm(instance=perfil)
+    
+    return render(request, 'perfil/editar_perfil.html', {'form': form})
+
+#Funnción para ver la información de los grupos
+# Al tener la otra pantalla (donde salen los grupos) podemos acceder al grupo mediante
+# su id, como por ahora es la segunda vista, solo se muestra la base de la vista sin 
+# datos.
+# podemos cambiar por def detalle_grupo(request, grupo_id):
+def detalle_grupo(request):
+    return render(request, 'grupos/detalle_grupo.html')

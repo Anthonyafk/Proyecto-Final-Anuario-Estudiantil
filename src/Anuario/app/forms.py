@@ -78,3 +78,16 @@ class UsuarioRegistroForm(UserCreationForm):
 class UsuarioBusquedaNominacion(forms.Form):
     #Input para texto tiene label, texto de ayuda, si es o no requerido y al final el parametro para insertar bootstrap
     nombre = forms.CharField(label="Nombre:", help_text="Buscar Estudiante...", required=False, widget=forms.TextInput(attrs={'class':'form-control'}))
+
+class PerfilForm(forms.ModelForm):
+    class Meta:
+        model = Perfil
+        fields = ['foto_perfil', 'foto_portada', 'biografia']
+        widgets = {
+            'biografia': forms.Textarea(attrs={'rows': 4, 'class': 'form-control'}),
+        }
+        labels = {
+            'foto_perfil': 'Foto de perfil',
+            'foto_portada': 'Foto de portada',
+            'biografia': 'Biografía'
+        }

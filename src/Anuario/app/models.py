@@ -101,8 +101,8 @@ class Usuario(AbstractBaseUser, PermissionsMixin):
 
 class Perfil(models.Model):
     idPerfil = models.AutoField(primary_key=True)
-    foto_perfil = models.TextField(blank=True)
-    foto_portada = models.TextField(blank=True)
+    foto_perfil = models.ImageField(upload_to='perfil/', blank=True)
+    foto_portada = models.ImageField(upload_to='portada/', blank=True)
     biografia = models.TextField(blank=True)
 
 class Grupo(models.Model):
