@@ -41,6 +41,7 @@ dependencies:
   - wheel=0.45.1
   - xz=5.6.4
   - zlib=1.2.13
+  - pillow
   - pip:
       - django==4.1.6
       - django-crispy-forms==1.14.0
