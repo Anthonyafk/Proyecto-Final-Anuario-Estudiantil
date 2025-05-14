@@ -93,7 +93,7 @@ def verNominacion(request, idNominacion):
     return render(request, "nomination/nomination.html", {'nominacion':nominacion, 'inscritos':inscritos, 'desabilitar':desabilitar, 'form':form, 'dato':dato})
 
 #Funcion para acceder al perfil del usuario
-def verPerfil(request):
+def verPerfil(request, usuario_id):
     # Obtiene el perfil y datos del usuario que inició la sesión
     try:
         relacion_tener = Tener.objects.get(numCuenta=request.user)
@@ -134,13 +134,15 @@ def editar_perfil(request):
 # datos.
 # podemos cambiar por def detalle_grupo(request, grupo_id):
 def detalle_grupo(request, grupo_id):
-    return render(request, 'grupos/detalle_grupo.html', {'grupo': grupo_id})  # Justo probe lo que comentabas :), funciona
+    grupo = Grupo.objects.get(codigo=grupo_id)
+    return render(request, 'grupos/detalle_grupo.html', {'grupo': grupo} )  # Justo probe lo que comentabas :), funciona
 
 
 
 # Función para ver los integrantes de un grupo
 def integrantes(request, grupo_id):
     pertenencias = Pertenecer.objects.filter(codigo__codigo=grupo_id)
+    grupo = Grupo.objects.get(codigo=grupo_id)
     integrantes_qs = Usuario.objects.filter(
         numCuenta__in=pertenencias.values_list('numCuenta', flat=True)
     )
@@ -155,4 +157,4 @@ def integrantes(request, grupo_id):
             integrantes_qs.filter(segundo_apellido__icontains=termino)
         )
 
-    return render(request, 'integrantes/integrantes.html', {'grupo': grupo_id, 'form': form, 'integrantes': integrantes_qs,})
+    return render(request, 'integrantes/integrantes.html', {'grupo': grupo, 'form': form, 'integrantes': integrantes_qs,})

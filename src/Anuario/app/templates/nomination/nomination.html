@@ -1,8 +1,9 @@
 {% extends 'base.html' %}
 {% block content %}
-<div class="flex-grow-1">
-	<div style="box-sizing: border-box;  display: flex; justify-content: space-between; align-items: center; padding: 2%;">
-		<h1>{{nominacion.categoria}}</h1>
+<div class="container flex-grow-1">
+	<div class="row py-4">
+			<div style="box-sizing: border-box;  display: flex; justify-content: space-between; align-items: center; padding: 2%;">
+			<h1>{{nominacion.categoria}}</h1>
 		<form action="" method="POST">
       {% csrf_token %}
       <div style="display: flex; justify-content: space-between;">
@@ -12,7 +13,7 @@
       </div>
     </form>
 		<button type="button" class="btn btn-success" {{desabilitar}}>Postularse</button>
-	</div>
+		</div>
 	
 	<div class="container">
 	    <p style="color: crimson;">{{dato}}</p>
@@ -20,5 +21,6 @@
 				{% include 'common/CardPostulados.html' %}
 			{% endfor %}
 		</div>
+	</div>
 </div>
 {% endblock %}

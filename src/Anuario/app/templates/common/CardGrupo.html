@@ -1,11 +1,13 @@
 {% load static %}
 <div class="card" style="height: 12rem; width: 20rem; border-radius: 10px; overflow: hidden;">
+  <a href="{% url 'detalle_grupo' grupo.codigo %}" style="text-decoration: none;">
   {% if grupo.foto_portada %}
     <img src="{{ grupo.foto_portada.url }}" class="card-img-top" alt="Imagen de Grupo" style="height: 120px; object-fit: cover;">  
   {% else %}
     <img src="{% static 'images/no-product-image.jpg' %}" class="card-img-top" alt="Imagen de Grupo" style="height: 121px; object-fit: cover;">  
   {% endif %}
-  <div class="card-body p-2">
+  <div class="card-body p-2 text-center">
     <p class="card-text mb-0 text-center text-muted">{{grupo.nombre}}</p>
   </div>
+  </a>
 </div>

@@ -8,8 +8,11 @@
     {% else %}
       <img src="{% static 'images/no-product-image.jpg' %}" alt="Sin imagen" class="rounded-circle me-sm-3 me-0" width="48" height="48">
     {% endif %}
+
     <div class="ms-sm-2 mt-2 mt-sm-0 text-start">
-      <div class="fw-semibold">{{ integrante.nombre }} {{ integrante.primer_apellido }} {{ integrante.segundo_apellido }}</div>
+      <a href="{% url 'perfil' integrante.numCuenta %}" style="text-decoration: none;">
+        <div class="fw-semibold text-dark">{{ integrante.nombre }} {{ integrante.primer_apellido }} {{ integrante.segundo_apellido }}</div>
+      </a>
       <div class="text-muted small">{{ integrante.correoE }}</div>
     </div>
   </div>
