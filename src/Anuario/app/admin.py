@@ -7,6 +7,3 @@ from .models import Grupo, Pertenecer
 @admin.register(Grupo)
 class GrupoAdmin(admin.ModelAdmin):
     list_display = ('codigo', 'nombre',)
-
-# Para asignar a grupos
-admin.site.register(Pertenecer)
