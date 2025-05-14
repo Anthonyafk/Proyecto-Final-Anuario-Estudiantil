@@ -134,7 +134,7 @@ def editar_perfil(request):
 # datos.
 # podemos cambiar por def detalle_grupo(request, grupo_id):
 def detalle_grupo(request, grupo_id):
-    return render(request, 'grupos/detalle_grupo.html', {'grupo': grupo_id})
+    return render(request, 'grupos/detalle_grupo.html', {'grupo': grupo_id})  # Justo probe lo que comentabas :), funciona
 
 
 
