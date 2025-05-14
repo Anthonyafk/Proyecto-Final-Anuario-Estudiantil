@@ -29,7 +29,7 @@ sepa en que vista se encuentra-->
                 </div>
                 
                 <button type="submit" class="btn btn-primary">Guardar Cambios</button>
-                <a href="{% url 'perfil' %}" class="btn btn-secondary">Cancelar</a>
+                <a href="{% url 'perfil' usuario_id=request.user.numCuenta %}" class="btn btn-secondary">Cancelar</a>
             </form>
         </div>
     </div>
