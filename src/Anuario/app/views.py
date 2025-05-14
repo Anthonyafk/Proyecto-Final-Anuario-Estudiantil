@@ -94,9 +94,11 @@ def verNominacion(request, idNominacion):
 
 #Funcion para acceder al perfil del usuario
 def verPerfil(request, usuario_id):
-    # Obtiene el perfil y datos del usuario que inició la sesión
+    
+    #Obtiene el Usuario  según el parámetro usuario_id
+    usuario_obj = Usuario.objects.get(numCuenta=usuario_id)
     try:
-        relacion_tener = Tener.objects.get(numCuenta=request.user)
+        relacion_tener = Tener.objects.get(numCuenta=usuario_obj)
         perfil = relacion_tener.idPerfil
     except Tener.DoesNotExist:
         # Si no existe el perfil, creamos uno vacío
@@ -105,11 +107,11 @@ def verPerfil(request, usuario_id):
             foto_portada="",
             biografia=""
         )
-        Tener.objects.create(numCuenta=request.user, idPerfil=perfil)
+        Tener.objects.create(numCuenta=usuario_obj, idPerfil=perfil)
     
     datos = {
         'perfil': perfil,
-        'usuario': request.user
+        'usuario': usuario_obj
     }
     return render(request, 'perfil/perfil.html', datos)
 
