@@ -1,16 +1,26 @@
 {% load static %}
-<div class="d-flex align-items-center justify-content-between py-2 border-bottom">
-  <!-- Avatar -->
-  <div class="d-flex align-items-center">
-    <img src="{{ integrante.tener.idPerfil.foto_perfil.url|default:static('images/no-product-image.jpg') }}"
-         alt="Avatar" class="rounded-circle me-3" width="48" height="48">
-    <div>
-      {{ integrante.nombre }} {{ integrante.primer_apellido }} {{ integrante.segundo_apellido }}
+
+<div class="d-flex flex-column flex-sm-row align-items-center justify-content-between py-2 border-bottom">
+  <!-- Avatar e información personal -->
+  <div class="d-flex align-items-center text-center text-sm-start mb-2 mb-sm-0">
+    {% if integrante.tener.idPerfil.foto_perfil %}
+      <img src="{{ integrante.tener.idPerfil.foto_perfil.url }}" alt="Avatar" class="rounded-circle me-sm-3 me-0" width="48" height="48">
+    {% else %}
+      <img src="{% static 'images/no-product-image.jpg' %}" alt="Sin imagen" class="rounded-circle me-sm-3 me-0" width="48" height="48">
+    {% endif %}
+    <div class="ms-sm-2 mt-2 mt-sm-0 text-start">
+      <div class="fw-semibold">{{ integrante.nombre }} {{ integrante.primer_apellido }} {{ integrante.segundo_apellido }}</div>
+      <div class="text-muted small">{{ integrante.correoE }}</div>
     </div>
   </div>
-  <!-- Botones de acción: menú y mensaje -->
+
+  <!-- Botones de acción -->
   <div class="d-flex align-items-center gap-2">
-    <button class="btn btn-sm btn-light"><i class="fas fa-ellipsis-h"></i></button>
-    <a href="mailto:{{ integrante.correoE }}" class="btn btn-sm btn-light"><i class="fas fa-envelope"></i></a>
+    <button class="btn btn-sm btn-light" aria-label="Más opciones">
+      <i class="fas fa-ellipsis-h"></i>
+    </button>
+    <a href="mailto:{{ integrante.correoE }}" class="btn btn-sm btn-light" aria-label="Enviar correo">
+      <i class="fas fa-envelope"></i>
+    </a>
   </div>
 </div>

@@ -1,4 +1,4 @@
-from django.shortcuts import render, redirect, get_object_or_404
+from django.shortcuts import render, redirect
 from django.contrib import messages
 from .models import Usuario, Grupo, Comentario, Publicacion, Nominacion, Perfil, Tener, Pertenecer, Postular # .... etc.
 from .forms import UsuarioRegistroForm, UsuarioBusquedaNominacion, PerfilForm
@@ -133,35 +133,26 @@ def editar_perfil(request):
 # su id, como por ahora es la segunda vista, solo se muestra la base de la vista sin 
 # datos.
 # podemos cambiar por def detalle_grupo(request, grupo_id):
-def detalle_grupo(request):
-    return render(request, 'grupos/detalle_grupo.html')
+def detalle_grupo(request, grupo_id):
+    return render(request, 'grupos/detalle_grupo.html', {'grupo': grupo_id})
+
+
 
 # Función para ver los integrantes de un grupo
-@login_required
-def integrantes(request, grupo_codigo):
-    grupo = get_object_or_404(Grupo, codigo=grupo_codigo)
-    form = UsuarioBusquedaNominacion(request.GET or None)
-
-    # obtenemos todos los usuarios que pertenecen
-    qs = Pertenecer.objects.filter(codigo=grupo).select_related('numCuenta__tener__idPerfil')
-    # devolvemos la lista de Usuario directamente
-    integrantes = Usuario.objects.filter(
-        numCuenta__in=qs.values_list('numCuenta', flat=True)
+def integrantes(request, grupo_id):
+    pertenencias = Pertenecer.objects.filter(codigo__codigo=grupo_id)
+    integrantes_qs = Usuario.objects.filter(
+        numCuenta__in=pertenencias.values_list('numCuenta', flat=True)
     )
 
-    # filtrado por nombre (si hay búsqueda)
-    if form.is_valid() and form.cleaned_data['nombre']:
+    # Filtro
+    form = UsuarioBusquedaNominacion(request.GET or None)
+    if form.is_valid() and form.cleaned_data.get('nombre'):
         termino = form.cleaned_data['nombre']
-        integrantes = integrantes.filter(
-            nombre__icontains=termino
-        ) | integrantes.filter(
-            primer_apellido__icontains=termino
-        ) | integrantes.filter(
-            segundo_apellido__icontains=termino
+        integrantes_qs = (
+            integrantes_qs.filter(nombre__icontains=termino) |
+            integrantes_qs.filter(primer_apellido__icontains=termino) |
+            integrantes_qs.filter(segundo_apellido__icontains=termino)
         )
 
-    return render(request, 'integrantes/integrantes.html', {
-        'grupo': grupo,
-        'form': form,
-        'integrantes': integrantes,
-    })
+    return render(request, 'integrantes/integrantes.html', {'grupo': grupo_id, 'form': form, 'integrantes': integrantes_qs,})

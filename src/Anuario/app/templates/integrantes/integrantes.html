@@ -1,20 +1,25 @@
 {% extends 'base.html' %}
+{% load static %}
 {% load widget_tweaks %}
+
 {% block content %}
 <div class="container py-4">
-  <!-- Breadcrumb / Back -->
-  <a href="{% url 'detalle_grupo' grupo.codigo %}" class="btn btn-link mb-3">
+
+  <!-- Botón volver -->
+  <a href="{% url 'detalle_grupo' grupo %}" class="btn btn-link mb-3">
     <i class="fas fa-arrow-left"></i> Volver
   </a>
 
-  <!-- Título -->
+  <!-- Título del grupo -->
   <h2>Integrantes de {{ grupo.nombre }}</h2>
 
-  <!-- Buscador -->
+  <!-- Formulario de búsqueda -->
   <form method="get" class="my-3">
     <div class="input-group">
-      {{ form.nombre|add_class:"form-control" | attr:"placeholder:Buscar Estudiante..."}}
-      <button class="btn btn-outline-secondary"><i class="fas fa-search"></i></button>
+      {{ form.nombre|add_class:"form-control" | attr:"placeholder:Buscar Estudiante..." }}
+      <button type="submit" class="btn btn-outline-secondary">
+        <i class="fas fa-search"></i>
+      </button>
     </div>
   </form>
 
@@ -23,8 +28,9 @@
     {% for integrante in integrantes %}
       {% include 'common/CardIntegrante.html' with integrante=integrante %}
     {% empty %}
-      <p class="text-muted">No hay integrantes.</p>
+      <div class="text-muted">No hay integrantes.</div>
     {% endfor %}
   </div>
+
 </div>
 {% endblock %}
