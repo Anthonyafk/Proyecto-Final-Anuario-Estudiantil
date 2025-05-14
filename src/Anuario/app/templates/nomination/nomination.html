@@ -8,11 +8,14 @@
       {% csrf_token %}
       <div style="display: flex; justify-content: space-between;">
           <label for="nombre" style="margin-right: 15px; margin-left: 15px;">Buscar Estudiante: </label>
-          {{form.nombre}}
+          {{formBusqueda.nombre}}
           <button type="submit" class="btn btn-primary" style="margin-left: 30px;"> Buscar </button>
       </div>
     </form>
-		<button type="button" class="btn btn-success" {{desabilitar}}>Postularse</button>
+    <form action="" method="POST">
+      {% csrf_token %}
+		  <button type="submit" name="Postular" class="btn btn-success" {{desabilitarPostulacion}}>Postularse</button>
+		</form>
 		</div>
 	
 	<div class="container">
