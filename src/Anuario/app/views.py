@@ -58,11 +58,9 @@ def home(request):
     return render(request, "home.html", { 'grupos' : grupos })
 
 #Esta funcion esta disponible sii existe al menos un grupo en la vista home
-def nominaciones(request):
-    #deberiamos obtenemos el id del grupo al que le dio clic el usuario en el paso anterior
-    codigo_grupo = 1
-    nominaciones = Nominacion.objects.filter(activa=True,existe__codigo__codigo=codigo_grupo)
-    return render(request, "nomination/all-nominations.html", {'nominaciones': nominaciones})
+def nominaciones(request,grupo_id):
+    nominaciones = Nominacion.objects.filter(activa=True,existe__codigo__codigo=grupo_id)
+    return render(request, "nomination/all-nominations.html", {'nominaciones': nominaciones,'grupo':grupo_id})
 
 #Función para mostrar la descripción de la nominación, junto con los estudiantes a votar y el botón para postularse
 def verNominacion(request, idNominacion):
