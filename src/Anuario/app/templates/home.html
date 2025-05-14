@@ -73,17 +73,13 @@
 	<div class="container">
     <div class="group-container">
       {% if grupos %}
-        {% for grupo in grupos %}
-            {% include "common/CardGrupo.html" with grupo=grupo %}
+        {% for g in grupos %}
+            {% include 'common/CardGrupo.html' with grupo=g %}
         {% endfor %}
       {% else %}
         <div class="masthead-subheading text-uppercase text-center">No tienes grupos registrados</div>
       {% endif %}
     </div>
-    <form action="{% url 'logout' %}" method="post">
-      {% csrf_token %}
-      <button type="submit">Log Out</button>
-    </form>
   </div>
   {% else %}
     <p>No has iniciado sesión</p>

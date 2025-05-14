@@ -2,6 +2,8 @@ from django import forms
 from django.contrib.auth.forms import UserCreationForm
 from .models import Usuario, Perfil, Tener
 
+# Formulario para el registro de un usuario.
+# Cada campo es necesario para la base de datos
 class UsuarioRegistroForm(UserCreationForm):
     numCuenta = forms.IntegerField(
         label="Número de cuenta",

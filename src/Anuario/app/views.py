@@ -18,6 +18,7 @@ def index(request):
     }
     return render(request, "index.html", contextosinpretexto)
 
+# Registra un usuario en la aplicación
 def signup(request):
     form = UsuarioRegistroForm()
     if request.method == 'POST':
@@ -44,10 +45,17 @@ def signup(request):
 
 @login_required
 def home(request):
-    #numCuenta= request.GET.get('numCuenta')
-    #usuario = Usuario.objects.get(numCuenta=numCuenta)
-    #grupos =
-    return render(request, "home.html")
+    grupos = []
+    try:
+        grupos_p = Pertenecer.objects.filter(numCuenta=request.user)
+    except:
+        grupos_p = []
+    for g in grupos_p:
+        print(g.codigo.codigo)
+        grupo_i = Grupo.objects.get(codigo=g.codigo.codigo)
+        grupos.append(grupo_i)
+    print(grupos)
+    return render(request, "home.html", { 'grupos' : grupos })
 
 #Esta funcion esta disponible sii existe al menos un grupo en la vista home
 def nominaciones(request):
