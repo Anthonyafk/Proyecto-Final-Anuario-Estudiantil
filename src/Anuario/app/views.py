@@ -50,10 +50,10 @@ def home(request):
         grupos_p = Pertenecer.objects.filter(numCuenta=request.user)
     except:
         grupos_p = []
+    print(grupos_p)
     for g in grupos_p:
-        print(g.codigo.codigo)
-        grupo_i = Grupo.objects.get(codigo=g.codigo.codigo)
-        grupos.append(grupo_i)
+        print(f"g.codigo: {g.codigo}")
+        grupos.append(g.codigo)
     print(grupos)
     return render(request, "home.html", { 'grupos' : grupos })
 
