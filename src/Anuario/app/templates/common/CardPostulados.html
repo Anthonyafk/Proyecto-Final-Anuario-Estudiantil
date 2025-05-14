@@ -7,7 +7,7 @@
             {{inscrito.numCuenta.primer_apellido}}
             {{inscrito.numCuenta.segundo_apellido}}
         </h3>
-        <a href='' class="btn btn-primary" style="margin: 2%;">Perfil</a>
+        <a href={% url 'perfil' inscrito.numCuenta.numCuenta%} class="btn btn-primary" style="margin: 2%;">Perfil</a>
         <form action="" method="POST">
         {% csrf_token %}
           <button type="submit" name="Votar" value={{inscrito.numCuenta.numCuenta}} class="btn btn-success" {{desabilitarVotacion}} style="margin: 2%;">Votar</button>

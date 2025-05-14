@@ -144,7 +144,7 @@ def editar_perfil(request):
         form = PerfilForm(request.POST, request.FILES, instance=perfil)
         if form.is_valid():
             form.save()
-            return redirect('perfil')  # Redirige al perfil después de editar
+            return redirect('perfil', usuario_id = request.user.numCuenta)  # Redirige al perfil después de editar
     else:
         form = PerfilForm(instance=perfil)
     
