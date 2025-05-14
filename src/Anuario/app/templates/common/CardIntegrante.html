@@ -1,0 +1,16 @@
+{% load static %}
+<div class="d-flex align-items-center justify-content-between py-2 border-bottom">
+  <!-- Avatar -->
+  <div class="d-flex align-items-center">
+    <img src="{{ integrante.tener.idPerfil.foto_perfil.url|default:static('images/no-product-image.jpg') }}"
+         alt="Avatar" class="rounded-circle me-3" width="48" height="48">
+    <div>
+      {{ integrante.nombre }} {{ integrante.primer_apellido }} {{ integrante.segundo_apellido }}
+    </div>
+  </div>
+  <!-- Botones de acción: menú y mensaje -->
+  <div class="d-flex align-items-center gap-2">
+    <button class="btn btn-sm btn-light"><i class="fas fa-ellipsis-h"></i></button>
+    <a href="mailto:{{ integrante.correoE }}" class="btn btn-sm btn-light"><i class="fas fa-envelope"></i></a>
+  </div>
+</div>
