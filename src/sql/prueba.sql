@@ -55,3 +55,7 @@ values
 	(5, 2, '2025-05-01 08:00:00', '2025-06-01 23:59:59'),
   	(6, 1, '2025-05-01 08:00:00', '2025-06-01 23:59:59');
 
+-- Alumnos Postulados en Nominaciones
+  insert into app_postular ("idNominacion_id", "numCuenta_id")
+	values 
+  	(6, 100001);
