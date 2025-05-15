@@ -1,6 +1,6 @@
 from django.shortcuts import render, redirect
 from django.contrib import messages
-from .models import Usuario, Grupo, Comentario, Publicacion, Nominacion, Perfil, Tener, Pertenecer, Postular # .... etc.
+from .models import Usuario, Grupo, Comentario, Publicacion, Nominacion, Perfil, Tener, Pertenecer, Postular, Votar # .... etc.
 from .forms import UsuarioRegistroForm, UsuarioBusquedaNominacion, PerfilForm
 from django.contrib.auth import authenticate, login
 from django.db import IntegrityError
@@ -18,6 +18,7 @@ def index(request):
     }
     return render(request, "index.html", contextosinpretexto)
 
+# Registra un usuario en la aplicación
 def signup(request):
     form = UsuarioRegistroForm()
     if request.method == 'POST':
@@ -44,10 +45,17 @@ def signup(request):
 
 @login_required
 def home(request):
-    #numCuenta= request.GET.get('numCuenta')
-    #usuario = Usuario.objects.get(numCuenta=numCuenta)
-    #grupos =
-    return render(request, "home.html")
+    grupos = []
+    try:
+        grupos_p = Pertenecer.objects.filter(numCuenta=request.user)
+    except:
+        grupos_p = []
+    print(grupos_p)
+    for g in grupos_p:
+        print(f"g.codigo: {g.codigo}")
+        grupos.append(g.codigo)
+    print(grupos)
+    return render(request, "home.html", { 'grupos' : grupos })
 
 #Esta funcion esta disponible sii existe al menos un grupo en la vista home
 def nominaciones(request):
@@ -59,36 +67,58 @@ def nominaciones(request):
 #Función para mostrar la descripción de la nominación, junto con los estudiantes a votar y el botón para postularse
 def verNominacion(request, idNominacion):
     #No se debe habilitar la opción de postularse si el usuario ya esta inscrito 
-    numCuenta = 1
-    form = UsuarioBusquedaNominacion()
-    desabilitar = ""
+    numCuenta = request.user
+    formBusqueda = UsuarioBusquedaNominacion()
+    
+    desabilitarPostulacion = ""
+    desabilitarVotacion = ""
     dato = ""
+    
     nominacion = Nominacion.objects.get(pk = idNominacion)
     inscritos = Postular.objects.filter(idNominacion = idNominacion)
+    
     usuarioInscrito = inscritos.filter(numCuenta = numCuenta)
     
     if(usuarioInscrito.exists()):
-        desabilitar = "disabled"
+        desabilitarPostulacion = "style= display:none;"
         inscritos = inscritos.exclude(numCuenta = numCuenta)
     
+    votoAntes = Votar.objects.filter(idNominacion = idNominacion)
+    votoAntes = votoAntes.filter(numCuenta = numCuenta.numCuenta)
+    
+    if(votoAntes.exists()):
+        desabilitarVotacion = "style=display:none;"
+    
     if(request.method == "POST"):
-        nombreCompleto = request.POST["nombre"]
-        if(nombreCompleto):
-            nombres = nombreCompleto.split()
-            for nombre in nombres:
-                inscritos = inscritos.filter(numCuenta__nombre__icontains = nombre) | inscritos.filter(numCuenta__primer_apellido__icontains = nombre) | inscritos.filter(numCuenta__segundo_apellido__icontains = nombre)
-        
-        if(not nombreCompleto):
-            dato = 'Busqueda vacia.'
+        if 'Postular' in request.POST:
+            postular = Postular(numCuenta = numCuenta, idNominacion = nominacion)
+            postular.save()
+            return redirect('verNominacion', idNominacion = idNominacion)
+        elif 'Votar' in request.POST:
+            aVotar = request.POST.get('Votar')
+            alumnoVotado = Usuario.objects.get(numCuenta = aVotar)
+            votacion = Votar(numCuenta = numCuenta, idNominacion = nominacion, alumnoVotado = alumnoVotado) 
+            votacion.save()
+            return redirect('verNominacion', idNominacion = idNominacion)
+        else:
+            nombreCompleto = request.POST["nombre"]
+            if(nombreCompleto):
+                nombres = nombreCompleto.split()
+                for nombre in nombres:
+                    inscritos = inscritos.filter(numCuenta__nombre__icontains = nombre) | inscritos.filter(numCuenta__primer_apellido__icontains = nombre) | inscritos.filter(numCuenta__segundo_apellido__icontains = nombre)
+            if(not nombreCompleto):
+                dato = 'Busqueda vacia.'
         
     
-    return render(request, "nomination/nomination.html", {'nominacion':nominacion, 'inscritos':inscritos, 'desabilitar':desabilitar, 'form':form, 'dato':dato})
+    return render(request, "nomination/nomination.html", {'nominacion':nominacion, 'inscritos':inscritos, 'desabilitarPostulacion':desabilitarPostulacion, 'formBusqueda':formBusqueda, 'dato':dato, 'desabilitarVotacion':desabilitarVotacion})
 
 #Funcion para acceder al perfil del usuario
-def verPerfil(request):
-    # Obtiene el perfil y datos del usuario que inició la sesión
+def verPerfil(request, usuario_id):
+    
+    #Obtiene el Usuario  según el parámetro usuario_id
+    usuario_obj = Usuario.objects.get(numCuenta=usuario_id)
     try:
-        relacion_tener = Tener.objects.get(numCuenta=request.user)
+        relacion_tener = Tener.objects.get(numCuenta=usuario_obj)
         perfil = relacion_tener.idPerfil
     except Tener.DoesNotExist:
         # Si no existe el perfil, creamos uno vacío
@@ -97,11 +127,11 @@ def verPerfil(request):
             foto_portada="",
             biografia=""
         )
-        Tener.objects.create(numCuenta=request.user, idPerfil=perfil)
+        Tener.objects.create(numCuenta=usuario_obj, idPerfil=perfil)
     
     datos = {
         'perfil': perfil,
-        'usuario': request.user
+        'usuario': usuario_obj
     }
     return render(request, 'perfil/perfil.html', datos)
 
@@ -125,5 +155,28 @@ def editar_perfil(request):
 # su id, como por ahora es la segunda vista, solo se muestra la base de la vista sin 
 # datos.
 # podemos cambiar por def detalle_grupo(request, grupo_id):
-def detalle_grupo(request):
-    return render(request, 'grupos/detalle_grupo.html')
+def detalle_grupo(request, grupo_id):
+    grupo = Grupo.objects.get(codigo=grupo_id)
+    return render(request, 'grupos/detalle_grupo.html', {'grupo': grupo} )  # Justo probe lo que comentabas :), funciona
+
+
+
+# Función para ver los integrantes de un grupo
+def integrantes(request, grupo_id):
+    pertenencias = Pertenecer.objects.filter(codigo__codigo=grupo_id)
+    grupo = Grupo.objects.get(codigo=grupo_id)
+    integrantes_qs = Usuario.objects.filter(
+        numCuenta__in=pertenencias.values_list('numCuenta', flat=True)
+    )
+
+    # Filtro
+    form = UsuarioBusquedaNominacion(request.GET or None)
+    if form.is_valid() and form.cleaned_data.get('nombre'):
+        termino = form.cleaned_data['nombre']
+        integrantes_qs = (
+            integrantes_qs.filter(nombre__icontains=termino) |
+            integrantes_qs.filter(primer_apellido__icontains=termino) |
+            integrantes_qs.filter(segundo_apellido__icontains=termino)
+        )
+
+    return render(request, 'integrantes/integrantes.html', {'grupo': grupo, 'form': form, 'integrantes': integrantes_qs,})

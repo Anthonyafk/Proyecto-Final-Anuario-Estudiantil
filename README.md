@@ -40,13 +40,6 @@ Estando en la misma altura que `manage.py` el cual se encuentra en `src/Anuario/
    python manage.py makemigrations
    python manage.py migrate
    ```
-2. (Opcional) Carga datos de ejemplo:
-
-   ```bash
-   python manage.py loaddata fixtures/usuariosPrueba.json
-   ```
-
-*El archivo de usuariosPrueba.json solo es un archivo donde se subieron algunos datos de pruebas para comprobar la integridad referencial de las tablas y para que no existieran problemas de ese estilo.*
 
 ---
 

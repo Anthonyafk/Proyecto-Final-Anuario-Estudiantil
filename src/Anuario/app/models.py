@@ -3,6 +3,7 @@ from django.core.validators import RegexValidator
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
 import pgtrigger
 
+# Necesario para manerjar la creación de usuarios con un modelo propio
 class UsuarioManager(BaseUserManager):
     def _create_user(self, numCuenta, nombre, nombre_usuario, correoE, password, **extra_fields):
         if not numCuenta:
@@ -36,6 +37,8 @@ class UsuarioManager(BaseUserManager):
         #extra_fields.setdefault('esAdmin', True)
         return self._create_user(numCuenta, nombre, nombre_usuario, correoE, password, **extra_fields)
 
+# Modelo modificario para un usuario de la aplicación
+# Utiliza la base de Django que provee la clase AbstractBaseUser
 class Usuario(AbstractBaseUser, PermissionsMixin):
     numCuenta = models.IntegerField(
         primary_key=True,
@@ -109,7 +112,7 @@ class Grupo(models.Model):
     codigo = models.AutoField(primary_key=True)
     nombre = models.CharField(max_length=50)
     descripcion = models.TextField(blank=True)
-    foto_portada = models.TextField(blank=True)
+    foto_portada = models.ImageField(upload_to='grupos/',blank=True)
 
 
 class Comentario(models.Model):
@@ -127,7 +130,7 @@ class Publicacion(models.Model):
     fecha_creacion = models.DateField()
     hora_creacion = models.TimeField()
     descripcion = models.TextField(blank=True)
-    imagen = models.TextField(blank=True)
+    imagen = models.ImageField(upload_to='publicacion/',blank=True)
     video_url = models.URLField(blank=True, null=True) # Atributo/campo de prueba para almacenar la URL de un video
 
 

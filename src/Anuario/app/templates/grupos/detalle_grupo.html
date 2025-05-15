@@ -4,11 +4,11 @@ sepa en que vista se encuentra-->
 {% block title %}Info Grupos{% endblock %}
 
 {% block content %}
-<div class="container-fluid px-4">
-    <div class="d-flex justify-content-between align-items-center py-3 border-bottom">
+<div class="container container-fluid px-4 flex-grow-1">
+    <!--<div class="d-flex justify-content-between align-items-center py-3 border-bottom">
         <div class="d-flex align-items-center gap-3">
         </div>
-    </div>
+    </div>-->
 
     <!-- Navegación -->
     <div class="d-flex align-items-center py-3">
@@ -19,7 +19,7 @@ sepa en que vista se encuentra-->
         <nav class="d-flex gap-3">
             <a href="#" class="text-dark text-decoration-none">Principal</a>
             <a href="{% url 'nominaciones' %}" class="text-dark text-decoration-none">Nominaciones</a>
-            <a href="#" class="text-dark text-decoration-none">Integrantes</a>
+            <a href="{% url 'integrantes' grupo_id=grupo.codigo %}" class="text-dark text-decoration-none">Integrantes</a>
             <a href="#" class="text-dark text-decoration-none">Administración</a>
         </nav>
     </div>
@@ -29,7 +29,7 @@ sepa en que vista se encuentra-->
     <div class="card-body"> 
         <h1 class="display-5 text-dark">
     <!--Cmabiar por el nombre de los grupos-->
-            Nombre del Grupo
+    {{grupo.nombre}}
         </h1>
     </div>
 </div>
