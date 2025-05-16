@@ -79,7 +79,13 @@ class UsuarioRegistroForm(UserCreationForm):
 
 class UsuarioBusquedaNominacion(forms.Form):
     #Input para texto tiene label, texto de ayuda, si es o no requerido y al final el parametro para insertar bootstrap
-    nombre = forms.CharField(label="Nombre:", help_text="Buscar Estudiante...", required=False, widget=forms.TextInput(attrs={'class':'form-control'}))
+    nombre = forms.CharField(
+        label="Nombre:", 
+        help_text="Buscar Estudiante...", 
+        required=False, widget=forms.TextInput(attrs={
+            'class':'form-control', 
+            'placeholder': 'Buscar Estudiante...'
+        }))
 
 class PerfilForm(forms.ModelForm):
     class Meta:

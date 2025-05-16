@@ -1,6 +1,6 @@
 from django.shortcuts import render, redirect
 from django.contrib import messages
-from .models import Usuario, Grupo, Comentario, Publicacion, Nominacion, Perfil, Tener, Pertenecer, Postular # .... etc.
+from .models import Usuario, Grupo, Comentario, Publicacion, Nominacion, Perfil, Tener, Pertenecer, Postular, Votar # .... etc.
 from .forms import UsuarioRegistroForm, UsuarioBusquedaNominacion, PerfilForm
 from django.contrib.auth import authenticate, login
 from django.db import IntegrityError
@@ -65,30 +65,50 @@ def nominaciones(request,grupo_id):
 #Función para mostrar la descripción de la nominación, junto con los estudiantes a votar y el botón para postularse
 def verNominacion(request, idNominacion):
     #No se debe habilitar la opción de postularse si el usuario ya esta inscrito 
-    numCuenta = 1
-    form = UsuarioBusquedaNominacion()
-    desabilitar = ""
+    numCuenta = request.user
+    formBusqueda = UsuarioBusquedaNominacion()
+    
+    desabilitarPostulacion = ""
+    desabilitarVotacion = ""
     dato = ""
+    
     nominacion = Nominacion.objects.get(pk = idNominacion)
     inscritos = Postular.objects.filter(idNominacion = idNominacion)
+    
     usuarioInscrito = inscritos.filter(numCuenta = numCuenta)
     
     if(usuarioInscrito.exists()):
-        desabilitar = "disabled"
+        desabilitarPostulacion = "style= display:none;"
         inscritos = inscritos.exclude(numCuenta = numCuenta)
     
+    votoAntes = Votar.objects.filter(idNominacion = idNominacion)
+    votoAntes = votoAntes.filter(numCuenta = numCuenta.numCuenta)
+    
+    if(votoAntes.exists()):
+        desabilitarVotacion = "style=display:none;"
+    
     if(request.method == "POST"):
-        nombreCompleto = request.POST["nombre"]
-        if(nombreCompleto):
-            nombres = nombreCompleto.split()
-            for nombre in nombres:
-                inscritos = inscritos.filter(numCuenta__nombre__icontains = nombre) | inscritos.filter(numCuenta__primer_apellido__icontains = nombre) | inscritos.filter(numCuenta__segundo_apellido__icontains = nombre)
-        
-        if(not nombreCompleto):
-            dato = 'Busqueda vacia.'
+        if 'Postular' in request.POST:
+            postular = Postular(numCuenta = numCuenta, idNominacion = nominacion)
+            postular.save()
+            return redirect('verNominacion', idNominacion = idNominacion)
+        elif 'Votar' in request.POST:
+            aVotar = request.POST.get('Votar')
+            alumnoVotado = Usuario.objects.get(numCuenta = aVotar)
+            votacion = Votar(numCuenta = numCuenta, idNominacion = nominacion, alumnoVotado = alumnoVotado) 
+            votacion.save()
+            return redirect('verNominacion', idNominacion = idNominacion)
+        else:
+            nombreCompleto = request.POST["nombre"]
+            if(nombreCompleto):
+                nombres = nombreCompleto.split()
+                for nombre in nombres:
+                    inscritos = inscritos.filter(numCuenta__nombre__icontains = nombre) | inscritos.filter(numCuenta__primer_apellido__icontains = nombre) | inscritos.filter(numCuenta__segundo_apellido__icontains = nombre)
+            if(not nombreCompleto):
+                dato = 'Busqueda vacia.'
         
     
-    return render(request, "nomination/nomination.html", {'nominacion':nominacion, 'inscritos':inscritos, 'desabilitar':desabilitar, 'form':form, 'dato':dato})
+    return render(request, "nomination/nomination.html", {'nominacion':nominacion, 'inscritos':inscritos, 'desabilitarPostulacion':desabilitarPostulacion, 'formBusqueda':formBusqueda, 'dato':dato, 'desabilitarVotacion':desabilitarVotacion})
 
 #Funcion para acceder al perfil del usuario
 def verPerfil(request, usuario_id):
@@ -122,7 +142,7 @@ def editar_perfil(request):
         form = PerfilForm(request.POST, request.FILES, instance=perfil)
         if form.is_valid():
             form.save()
-            return redirect('perfil')  # Redirige al perfil después de editar
+            return redirect('perfil', usuario_id=request.user.numCuenta)  # Redirige al perfil después de editar
     else:
         form = PerfilForm(instance=perfil)
     
