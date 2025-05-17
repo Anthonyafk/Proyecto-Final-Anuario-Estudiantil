@@ -42,6 +42,8 @@ sepa en que vista se encuentra-->
   <!-- Nombre de usuario -->
  <div class="text-center mt-5">  <!-- mt-5 para espacio después de la foto -->
     <h2 class="mb-1">{{ usuario.nombre }} {{ usuario.primer_apellido }} {{ usuario.segundo_apellido }}</h2>
+    <!-- Usuario -->
+    <h4 class="mb-1" style="padding: 1%">{{ usuario.nombre_usuario}}</h4>
     <!--Verifica si el que está viendo el perfil es el dueño de la cuenta, de ser 
     así muestra el botón de "editar perfil"-->
     {% if request.user.numCuenta == usuario.numCuenta %}
