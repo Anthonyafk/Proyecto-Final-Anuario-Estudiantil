@@ -49,6 +49,8 @@ sepa en que vista se encuentra-->
     {% if request.user.numCuenta == usuario.numCuenta %}
       <a href="{% url 'editar_perfil' %}" class="btn btn-primary">Editar Perfil</a>
     {% endif %}
+    
+    {{marco.marco_foto}}
   </div>
 </div>
       
