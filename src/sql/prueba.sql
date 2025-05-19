@@ -19,6 +19,14 @@ VALUES (117001778, 1);
 INSERT INTO app_pertenecer ("numCuenta_id", codigo_id)
 VALUES (114007889, 1);
 
+
+-- Premios
+INSERT INTO app_ganar ("premio", "activa", "idNominacion_id", "numCuenta_id")
+VALUES ('Un Marco', true, 4, 114007889);
+
+INSERT INTO app_ganar ("premio", "activa", "idNominacion_id", "numCuenta_id")
+VALUES ('Dos Marcos', true, 2, 114007889);
+
 -- Insertar 5 nominaciones
 INSERT INTO app_nominacion (categoria, descripcion, activa)
 VALUES 
