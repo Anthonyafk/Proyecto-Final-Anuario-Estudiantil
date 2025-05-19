@@ -19,6 +19,21 @@ VALUES (117001778, 1);
 INSERT INTO app_pertenecer ("numCuenta_id", codigo_id)
 VALUES (114007889, 1);
 
+
+-- Premios
+INSERT INTO app_ganar ("premio", "activa", "idNominacion_id", "numCuenta_id")
+VALUES ('Un Marco', true, 4, 114007889);
+
+INSERT INTO app_ganar ("premio", "activa", "idNominacion_id", "numCuenta_id")
+VALUES ('Dos Marcos', true, 2, 114007889);
+
+-- Comentario
+insert into app_comentario ("contenido", "fecha_creacion", "hora_creacion", "idPerfil_id", "numCuenta_id")
+values ('Mi comentario dice hola', '2025-02-19', '08:00:00', 1, 114007889)
+
+insert into app_comentario ("contenido", "fecha_creacion", "hora_creacion", "idPerfil_id", "numCuenta_id")
+values ('Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.', '2025-02-19', '24:00:00', 1, 114007889)
+
 -- Insertar 5 nominaciones
 INSERT INTO app_nominacion (categoria, descripcion, activa)
 VALUES 

@@ -1,6 +1,7 @@
 {% load static %}
 <div class="container my-3">
     <div class="d-flex align-items-center justify-content-between p-3" style="box-sizing: border-box;  display: flex; justify-content: space-between; align-items: center;">
+        <!--Foto de Perfil -->
          <div class="border border-4 border-white rounded-circle" style="width: 100px; height: 100px; overflow: hidden;">
           {% if inscrito.numCuenta.tener.idPerfil.foto_perfil %}
             <img src="{{ inscrito.numCuenta.tener.idPerfil.foto_perfil.url }}" alt="Imagen Perfil"" class="img-fluid w-100 h-100" style="object-fit: cover;">
@@ -10,7 +11,7 @@
             </div>
           {% endif %}
          </div>
-        
+        <!--Postulados -->
         <h3 class="flex-grow-1 px-5 text-dark" style="width: 40%;">
             {{inscrito.numCuenta.nombre}}
             {{inscrito.numCuenta.primer_apellido}}
