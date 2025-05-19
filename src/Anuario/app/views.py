@@ -1,6 +1,6 @@
 from django.shortcuts import render, redirect
 from django.contrib import messages
-from .models import Usuario, Grupo, Comentario, Publicacion, Nominacion, Perfil, Tener, Pertenecer, Postular, Votar # .... etc.
+from .models import Usuario, Grupo, Comentario, Publicacion, Nominacion, Perfil, Tener, Pertenecer, Postular, Votar, MarcoFoto, Ganar # .... etc.
 from .forms import UsuarioRegistroForm, UsuarioBusquedaNominacion, PerfilForm
 from django.contrib.auth import authenticate, login
 from django.db import IntegrityError
@@ -72,6 +72,8 @@ def verNominacion(request, idNominacion):
     desabilitarVotacion = ""
     dato = ""
     
+    marcos = MarcoFoto.objects.all()
+    
     nominacion = Nominacion.objects.get(pk = idNominacion)
     inscritos = Postular.objects.filter(idNominacion = idNominacion)
     
@@ -108,7 +110,7 @@ def verNominacion(request, idNominacion):
                 dato = 'Busqueda vacia.'
         
     
-    return render(request, "nomination/nomination.html", {'nominacion':nominacion, 'inscritos':inscritos, 'desabilitarPostulacion':desabilitarPostulacion, 'formBusqueda':formBusqueda, 'dato':dato, 'desabilitarVotacion':desabilitarVotacion})
+    return render(request, "nomination/nomination.html", {'nominacion':nominacion, 'inscritos':inscritos, 'desabilitarPostulacion':desabilitarPostulacion, 'formBusqueda':formBusqueda, 'dato':dato, 'desabilitarVotacion':desabilitarVotacion, 'marcos':marcos})
 
 #Funcion para acceder al perfil del usuario
 def verPerfil(request, usuario_id):
@@ -118,6 +120,7 @@ def verPerfil(request, usuario_id):
     try:
         relacion_tener = Tener.objects.get(numCuenta=usuario_obj)
         perfil = relacion_tener.idPerfil
+        marco = MarcoFoto.objects.filter(idPerfil=perfil)
     except Tener.DoesNotExist:
         # Si no existe el perfil, creamos uno vacío
         perfil = Perfil.objects.create(
@@ -126,10 +129,10 @@ def verPerfil(request, usuario_id):
             biografia=""
         )
         Tener.objects.create(numCuenta=usuario_obj, idPerfil=perfil)
-    
     datos = {
         'perfil': perfil,
-        'usuario': usuario_obj
+        'usuario': usuario_obj,
+        'marco': marco.first()
     }
     return render(request, 'perfil/perfil.html', datos)
 
@@ -138,15 +141,25 @@ def editar_perfil(request):
     # Obtener el perfil del usuario actual
     perfil = request.user.tener.idPerfil
     
+    # Obtiene todos los marcos que ha ganado el usuario
+    marcos = Ganar.objects.filter(numCuenta = request.user)
+    
     if request.method == 'POST':
         form = PerfilForm(request.POST, request.FILES, instance=perfil)
         if form.is_valid():
+            marcoElegido = request.POST.get('marco_foto')
+            if marcoElegido:
+                marcoUnoAUno = MarcoFoto.objects.filter(idPerfil=perfil)
+                if marcoUnoAUno.exists():
+                    marcoUnoAUno.delete()
+                marcofoto = MarcoFoto(idPerfil=perfil, marco_foto=marcoElegido) 
+                marcofoto.save()
             form.save()
             return redirect('perfil', usuario_id=request.user.numCuenta)  # Redirige al perfil después de editar
     else:
         form = PerfilForm(instance=perfil)
     
-    return render(request, 'perfil/editar_perfil.html', {'form': form})
+    return render(request, 'perfil/editar_perfil.html', {'form': form, 'marcos': marcos})
 
 #Funnción para ver la información de los grupos
 # Al tener la otra pantalla (donde salen los grupos) podemos acceder al grupo mediante
@@ -163,6 +176,9 @@ def detalle_grupo(request, grupo_id):
 def integrantes(request, grupo_id):
     pertenencias = Pertenecer.objects.filter(codigo__codigo=grupo_id)
     grupo = Grupo.objects.get(codigo=grupo_id)
+    
+    marcos = MarcoFoto.objects.all()
+    
     integrantes_qs = Usuario.objects.filter(
         numCuenta__in=pertenencias.values_list('numCuenta', flat=True)
     )
@@ -177,4 +193,4 @@ def integrantes(request, grupo_id):
             integrantes_qs.filter(segundo_apellido__icontains=termino)
         )
 
-    return render(request, 'integrantes/integrantes.html', {'grupo': grupo, 'form': form, 'integrantes': integrantes_qs,})
+    return render(request, 'integrantes/integrantes.html', {'grupo': grupo, 'form': form, 'integrantes': integrantes_qs, 'marcos':marcos})

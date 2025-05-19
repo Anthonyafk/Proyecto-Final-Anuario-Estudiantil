@@ -14,7 +14,10 @@ VALUES (DEFAULT, 'Grupo 2', 'otro grupo', '');
 
 -- Asociar el usuario al grupo
 INSERT INTO app_pertenecer ("numCuenta_id", codigo_id)
-VALUES (100001, 1);
+VALUES (117001778, 1);
+
+INSERT INTO app_pertenecer ("numCuenta_id", codigo_id)
+VALUES (114007889, 1);
 
 -- Insertar 5 nominaciones
 INSERT INTO app_nominacion (categoria, descripcion, activa)
@@ -24,9 +27,6 @@ VALUES
   ('Líder Inspirador', 'Por liderazgo destacado', TRUE),
   ('Innovador del Año', 'Por ideas fuera de lo común', TRUE),
   ('Crecimiento Personal', 'Por superación personal notable', TRUE);
-
-
-	
 
 -- Crear el perfil del usuario
 INSERT INTO app_perfil (foto_perfil, foto_portada, biografia)
