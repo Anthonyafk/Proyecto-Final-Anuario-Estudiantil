@@ -66,6 +66,19 @@ sepa en que vista se encuentra-->
       </div>
       
          </div>  
+         <!-- Sección de Dedicatorias -->
+         <div>
+           <!-- Botón añadir comentario -->
+           {% if request.user.numCuenta != usuario.numCuenta %}
+           <div style="display: flex;">
+            <a href="{}" class="btn btn-primary" style="margin-left: auto;">Añadir Comentario</a>
+           </div>
+           {% endif %}
+            <!-- Comentarios -->
+            {% for comentario in comentarios %}
+              {% include 'common/CardComentarios.html' %}
+            {% endfor%}
+         </div>
   {% else %}
     <div class="container mt-5">
       <div class="alert alert-warning text-center">
@@ -76,3 +89,4 @@ sepa en que vista se encuentra-->
   {% endif %}
 </div>  
 {% endblock %}
+<br>

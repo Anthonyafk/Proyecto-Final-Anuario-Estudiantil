@@ -1,6 +1,6 @@
 from django.shortcuts import render, redirect
 from django.contrib import messages
-from .models import Usuario, Grupo, Comentario, Publicacion, Nominacion, Perfil, Tener, Pertenecer, Postular, Votar, MarcoFoto, Ganar # .... etc.
+from .models import Usuario, Grupo, Comentario, Publicacion, Nominacion, Perfil, Tener, Pertenecer, Postular, Votar, MarcoFoto, Ganar, Comentario # .... etc.
 from .forms import UsuarioRegistroForm, UsuarioBusquedaNominacion, PerfilForm
 from django.contrib.auth import authenticate, login
 from django.db import IntegrityError
@@ -123,6 +123,7 @@ def verPerfil(request, usuario_id):
         relacion_tener = Tener.objects.get(numCuenta=usuario_obj)
         perfil = relacion_tener.idPerfil
         marco = MarcoFoto.objects.filter(idPerfil=perfil)
+        comentarios = Comentario.objects.filter(idPerfil=perfil)
     except Tener.DoesNotExist:
         # Si no existe el perfil, creamos uno vacío
         perfil = Perfil.objects.create(
@@ -134,7 +135,8 @@ def verPerfil(request, usuario_id):
     datos = {
         'perfil': perfil,
         'usuario': usuario_obj,
-        'marco': marco.first()
+        'marco': marco.first(),
+        'comentarios': comentarios
     }
     return render(request, 'perfil/perfil.html', datos)
 
