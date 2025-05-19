@@ -2,14 +2,26 @@
 {% load static %}
 {% load widget_tweaks %}
 
+{% block title %}Integrantes{% endblock %}
+
 {% block content %}
+<div class="container container-fluid px-4 flex-grow-1">
+    <!-- Navegación -->
+    <div class="d-flex align-items-center py-3">
+        <button class="btn btn-link text-dark me-3 p-0 border-0 bg-transparent">
+            <i class="fas fa-arrow-left"></i>
+        </button>
+        <!--Cuando se tengan las demás vistas completar estos campos para redirigir a otra vista-->
+        <nav class="d-flex gap-3">
+            <a href="{% url 'detalle_grupo' grupo_id=grupo.codigo  %}" class="text-dark text-decoration-none">Principal</a>
+            <a href="{% url 'nominaciones' grupo_id=grupo.codigo %}" class="text-dark text-decoration-none">Nominaciones</a>
+            <a href="#" class="text-dark text-decoration-none">Integrantes</a>
+            <a href="#" class="text-dark text-decoration-none">Administración</a>
+        </nav>
+    </div>
+</div>
+
 <div class="container flex-grow-1  py-4">
-
-  <!-- Botón volver -->
-  <a href="{% url 'detalle_grupo' grupo.codigo %}" class="btn btn-link mb-3">
-    <i class="fas fa-arrow-left"></i> Volver
-  </a>
-
   <!-- Título del grupo -->
   <div class="row">
     <div class="col-4">
