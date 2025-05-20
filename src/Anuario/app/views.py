@@ -4,7 +4,8 @@ from .models import Usuario, Grupo, Comentario, Publicacion, Nominacion, Perfil,
 from .forms import UsuarioRegistroForm, UsuarioBusquedaNominacion, PerfilForm, DejarComentario, GroupJoinForm, GrupoForm
 from django.contrib.auth import authenticate, login
 from django.db import IntegrityError
-from django.contrib.auth.decorators import login_required, user_passes_test
+from django.contrib.auth.decorators import login_required
+from django.contrib.admin.views.decorators import staff_member_required
 from datetime import date
 from datetime import datetime
 
@@ -241,12 +242,8 @@ def unirse_grupo(request):
 
     return render(request, 'grupos/unirseGrupo.html', { 'form': form, 'grupo': grupo, 'redirigir': redirigir })
 
-# Función para determinar si el usuario es administrador
-def es_admin(user):
-    return user.is_staff
-
 # Función para crear o editar un grupo
-@login_required
+@staff_member_required
 def crear_o_editar_grupo(request, grupo_id=None):
     if grupo_id:
         # editar
