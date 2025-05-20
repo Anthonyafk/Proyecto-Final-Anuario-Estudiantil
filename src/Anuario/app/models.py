@@ -220,6 +220,8 @@ class Gestionar(models.Model):
 
     class Meta:
         unique_together = (('numCuenta', 'codigo'),)
+        verbose_name = "Gestionar"          # Para mostrar correctamente el nombre de gestionar en la interfaz de administración de Django
+        verbose_name_plural = "Gestionar"  
 
 
 class Pertenecer(models.Model):
