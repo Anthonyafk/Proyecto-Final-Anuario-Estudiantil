@@ -115,3 +115,14 @@ class GroupJoinForm(forms.Form):
         if not Grupo.objects.filter(codigo=codigo).exists():
             raise forms.ValidationError("Este grupo no existe.")
         return codigo
+    
+    
+class DejarComentario(forms.Form):
+    #Input para texto tiene label, texto de ayuda, si es o no requerido y al final el parametro para insertar bootstrap
+    comentario = forms.CharField(
+        label="Comentario:", 
+        help_text="Escribe tu comentario...", 
+        required=False, widget=forms.TextInput(attrs={
+            'class':'form-control', 
+            'placeholder': 'Escribe tu comentario...'
+        }))
