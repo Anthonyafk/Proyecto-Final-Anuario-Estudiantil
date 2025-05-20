@@ -70,8 +70,8 @@ sepa en que vista se encuentra-->
          <div>
            <!-- Botón añadir comentario -->
            {% if request.user.numCuenta != usuario.numCuenta %}
-           <div style="display: flex;">
-            <a href="{}" class="btn btn-primary" style="margin-left: auto;">Añadir Comentario</a>
+           <div style="display: flex; margin-bottom:2%;">
+            <a href="{% url 'add_comentario' perfil.idPerfil %}" class="btn btn-primary" style="margin-left: auto;">Añadir Comentario</a>
            </div>
            {% endif %}
             <!-- Comentarios -->

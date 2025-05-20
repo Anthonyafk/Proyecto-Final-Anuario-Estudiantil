@@ -7,6 +7,7 @@ urlpatterns = [
     path("verNominacion/<str:idNominacion>", views.verNominacion, name="verNominacion"),
     #path("551123012/", views.index, name="index"),
     path("perfil/<int:usuario_id>", views.verPerfil, name="perfil"),
+    path("perfil/comentario/<int:idPerfil>", views.comentarioPerfil, name="add_comentario"),
     path("perfil/editar/", views.editar_perfil, name="editar_perfil"),
     # path("grupo/info/", views.detalle_grupo, name="grupo_info"),
     path('grupos/<int:grupo_id>/',views.detalle_grupo,name='detalle_grupo'), #ruta anterior pero dinamica

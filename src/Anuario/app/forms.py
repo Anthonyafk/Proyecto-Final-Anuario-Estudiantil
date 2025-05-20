@@ -99,3 +99,13 @@ class PerfilForm(forms.ModelForm):
             'foto_portada': 'Foto de portada',
             'biografia': 'Biografía'
         }
+
+class DejarComentario(forms.Form):
+    #Input para texto tiene label, texto de ayuda, si es o no requerido y al final el parametro para insertar bootstrap
+    comentario = forms.CharField(
+        label="Comentario:", 
+        help_text="Escribe tu comentario...", 
+        required=False, widget=forms.TextInput(attrs={
+            'class':'form-control', 
+            'placeholder': 'Escribe tu comentario...'
+        }))

@@ -1,10 +1,12 @@
 from django.shortcuts import render, redirect
 from django.contrib import messages
 from .models import Usuario, Grupo, Comentario, Publicacion, Nominacion, Perfil, Tener, Pertenecer, Postular, Votar, MarcoFoto, Ganar, Comentario # .... etc.
-from .forms import UsuarioRegistroForm, UsuarioBusquedaNominacion, PerfilForm
+from .forms import UsuarioRegistroForm, UsuarioBusquedaNominacion, PerfilForm, DejarComentario
 from django.contrib.auth import authenticate, login
 from django.db import IntegrityError
 from django.contrib.auth.decorators import login_required
+from datetime import date
+from datetime import datetime
 
 from django.shortcuts import HttpResponse #prueba
 def index(request):
@@ -164,6 +166,26 @@ def editar_perfil(request):
         form = PerfilForm(instance=perfil)
     
     return render(request, 'perfil/editar_perfil.html', {'form': form, 'marcos': marcos})
+
+#Función para añadir comentarios
+def comentarioPerfil(request, idPerfil):
+    formComentar = DejarComentario()
+    usuario = Tener.objects.get(idPerfil=idPerfil)
+    perfil = Perfil.objects.get(idPerfil=idPerfil)
+    nota = ""
+    if request.method == 'POST':
+        comentario = request.POST["comentario"]
+        if(comentario):
+            fecha_creacion = date.today()
+            now = datetime.now()
+            subir = Comentario(idPerfil=perfil, numCuenta=request.user, contenido=comentario, fecha_creacion=fecha_creacion, hora_creacion=now.time())
+            subir.save()
+            return redirect('perfil', usuario_id = usuario.numCuenta.numCuenta)
+        else:
+            nota="No se puede publicar un comentario vacio."
+    
+    return render(request, 'common/dejarComentario.html', {'formComentar': formComentar, 'usuario':usuario, 'nota':nota})
+
 
 #Funnción para ver la información de los grupos
 # Al tener la otra pantalla (donde salen los grupos) podemos acceder al grupo mediante
