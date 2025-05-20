@@ -1,0 +1,21 @@
+{# templates/admin/admin_comentarios.html #}
+{% extends 'admin/admin_base.html' %}
+
+{% block admin_title %}Administrar Comentarios{% endblock %}
+{% block header %}Comentarios{% endblock %}
+
+{% block admin_content %}
+  {% for com in comentarios%}
+    <tr>
+      <td>{{ com.numCuenta }}</td>
+      <td>Realizado {{ com.fecha_creacion|date:"d/m/Y" }} - {{ com.hora_creacion|time:"H:i:s" }}</td>
+      <td>
+        <div class="d-flex gap-2">
+          <a href="{% url 'revisar_publicacion' pub.id %}" class="btn btn-info">Revisar</a>
+          <a href="{% url 'eliminar_publicacion' pub.id %}" class="btn btn-danger">🗑 Eliminar</a>
+        </div>
+      </td>
+    </tr>
+  {% endfor %}
+{% endblock %}
+

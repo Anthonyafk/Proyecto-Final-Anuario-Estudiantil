@@ -1,12 +1,17 @@
+import secrets
+import string
 from django.shortcuts import render, redirect
 from django.contrib import messages
-from .models import Usuario, Grupo, Comentario, Publicacion, Nominacion, Perfil, Tener, Pertenecer, Postular, Votar, MarcoFoto, Ganar # .... etc.
-from .forms import UsuarioRegistroForm, UsuarioBusquedaNominacion, PerfilForm
+from .models import Usuario, Grupo, Comentario, Publicacion, Nominacion, Perfil, Tener, Pertenecer, Postular, Votar, MarcoFoto, Ganar, Comentario, Gestionar, Poseer # .... etc.
+from .forms import UsuarioRegistroForm, UsuarioBusquedaNominacion, PerfilForm, DejarComentario, GroupJoinForm, GrupoForm
 from django.contrib.auth import authenticate, login
 from django.db import IntegrityError
 from django.contrib.auth.decorators import login_required
-
+from django.contrib.admin.views.decorators import staff_member_required
+from datetime import date
+from datetime import datetime
 from django.shortcuts import HttpResponse #prueba
+
 def index(request):
     contextosinpretexto = {
     'usuarios': Usuario.objects.all(),
@@ -46,12 +51,16 @@ def signup(request):
 @login_required
 def home(request):
     grupos = []
+    usuario = request.user
+    print(usuario)
     try:
-        grupos_p = Pertenecer.objects.filter(numCuenta=request.user)
+        if usuario.is_superuser:
+            grupos_u = Gestionar.objects.filter(numCuenta=usuario)
+        else:
+            grupos_u = Pertenecer.objects.filter(numCuenta=usuario)
     except:
-        grupos_p = []
-    print(grupos_p)
-    for g in grupos_p:
+        grupos_u = []
+    for g in grupos_u:
         print(f"g.codigo: {g.codigo}")
         grupos.append(g.codigo)
     print(grupos)
@@ -59,8 +68,9 @@ def home(request):
 
 #Esta funcion esta disponible sii existe al menos un grupo en la vista home
 def nominaciones(request,grupo_id):
+    grupo = Grupo.objects.get(codigo=grupo_id)
     nominaciones = Nominacion.objects.filter(activa=True,existe__codigo__codigo=grupo_id)
-    return render(request, "nomination/all-nominations.html", {'nominaciones': nominaciones,'grupo':grupo_id})
+    return render(request, "nomination/all-nominations.html", {'nominaciones': nominaciones,'grupo':grupo})
 
 #Función para mostrar la descripción de la nominación, junto con los estudiantes a votar y el botón para postularse
 def verNominacion(request, idNominacion):
@@ -121,6 +131,7 @@ def verPerfil(request, usuario_id):
         relacion_tener = Tener.objects.get(numCuenta=usuario_obj)
         perfil = relacion_tener.idPerfil
         marco = MarcoFoto.objects.filter(idPerfil=perfil)
+        comentarios = Comentario.objects.filter(idPerfil=perfil)
     except Tener.DoesNotExist:
         # Si no existe el perfil, creamos uno vacío
         perfil = Perfil.objects.create(
@@ -132,7 +143,8 @@ def verPerfil(request, usuario_id):
     datos = {
         'perfil': perfil,
         'usuario': usuario_obj,
-        'marco': marco.first()
+        'marco': marco.first(),
+        'comentarios': comentarios
     }
     return render(request, 'perfil/perfil.html', datos)
 
@@ -161,6 +173,26 @@ def editar_perfil(request):
     
     return render(request, 'perfil/editar_perfil.html', {'form': form, 'marcos': marcos})
 
+#Función para añadir comentarios
+def comentarioPerfil(request, idPerfil):
+    formComentar = DejarComentario()
+    usuario = Tener.objects.get(idPerfil=idPerfil)
+    perfil = Perfil.objects.get(idPerfil=idPerfil)
+    nota = ""
+    if request.method == 'POST':
+        comentario = request.POST["comentario"]
+        if(comentario):
+            fecha_creacion = date.today()
+            now = datetime.now()
+            subir = Comentario(idPerfil=perfil, numCuenta=request.user, contenido=comentario, fecha_creacion=fecha_creacion, hora_creacion=now.time())
+            subir.save()
+            return redirect('perfil', usuario_id = usuario.numCuenta.numCuenta)
+        else:
+            nota="No se puede publicar un comentario vacio."
+    
+    return render(request, 'common/dejarComentario.html', {'formComentar': formComentar, 'usuario':usuario, 'nota':nota})
+
+
 #Funnción para ver la información de los grupos
 # Al tener la otra pantalla (donde salen los grupos) podemos acceder al grupo mediante
 # su id, como por ahora es la segunda vista, solo se muestra la base de la vista sin 
@@ -169,8 +201,6 @@ def editar_perfil(request):
 def detalle_grupo(request, grupo_id):
     grupo = Grupo.objects.get(codigo=grupo_id)
     return render(request, 'grupos/detalle_grupo.html', {'grupo': grupo} )  # Justo probe lo que comentabas :), funciona
-
-
 
 # Función para ver los integrantes de un grupo
 def integrantes(request, grupo_id):
@@ -194,3 +224,139 @@ def integrantes(request, grupo_id):
         )
 
     return render(request, 'integrantes/integrantes.html', {'grupo': grupo, 'form': form, 'integrantes': integrantes_qs, 'marcos':marcos})
+
+def ad_alumnos(request,grupo_id):
+    grupo = Grupo.objects.get(codigo=grupo_id)
+    pertenencias = Pertenecer.objects.filter(codigo__codigo=grupo_id)
+    alumnos = Usuario.objects.filter(
+        numCuenta__in=pertenencias.values_list('numCuenta', flat=True)
+    )
+
+    # Filtro
+    form = UsuarioBusquedaNominacion(request.GET or None)
+    if form.is_valid() and form.cleaned_data.get('nombre'):
+        termino = form.cleaned_data['nombre']
+        alumnos = (
+            alumnos.filter(nombre__icontains=termino) |
+            alumnos.filter(primer_apellido__icontains=termino) |
+            alumnos.filter(segundo_apellido__icontains=termino)
+        )
+    return render(request, 'admin/admin_alumnos.html', {
+        'alumnos': alumnos,
+        'form' : form,
+        'grupo' : grupo
+    })
+
+def get_publicaciones(grupo_id):
+    publicaciones = Publicacion.objects.filter(
+        numCuenta__in=Pertenecer.objects.filter(
+            codigo__codigo=grupo_id
+        ).values_list('numCuenta', flat=True)
+    ).order_by('-fecha_creacion', '-hora_creacion')  # Opcional: más recientes primero
+
+def ad_publicaciones(request, grupo_id):
+    # Subconsulta: obtener publicaciones de alumnos que pertenecen al grupo
+    grupo = Grupo.objects.get(codigo=grupo_id)
+    publicaciones = get_publicaciones(grupo_id)
+
+    return render(request, 'admin/admin_publicaciones.html', {
+        'publicaciones': publicaciones,
+        'grupo' : grupo
+    })
+
+def ad_comentarios(request, grupo_id):
+    # Obtener publicaciones del grupo
+    publicaciones = get_publicaciones(grupo_id)
+    if publicaciones:
+        publicaciones_ids = publicaciones.values_list('idPublicacion', flat=True)
+        # Obtener comentarios relacionados usando la tabla intermedia Poseer
+        comentarios = Comentario.objects.filter(
+            idcomentario__in=Poseer.objects.filter(
+                idPublicacion__in=publicaciones_ids
+            ).values_list('idComentario', flat=True)
+        ).order_by('-fecha_creacion', '-hora_creacion')  # Si tu modelo Comentario tiene estos campos
+    else:
+        comentarios = []
+
+    grupo = Grupo.objects.get(codigo=grupo_id)
+    return render(request, 'admin/admin_comentarios.html', {
+        'grupo' : grupo,
+        'comentarios' : comentarios
+    })
+
+def unirse_grupo(request):
+    grupo = None
+    redirigir = False   # para saber si redirigir tras isncripción o no
+    if request.method == 'POST':
+        form = GroupJoinForm(request.POST)
+        if form.is_valid():
+            codigo = form.cleaned_data['codigo']
+            grupo = buscar_grupo_por_codigo(codigo)
+            if grupo:
+                if Pertenecer.objects.filter(numCuenta=request.user, codigo=grupo).exists():
+                    messages.warning(request, f"Ya estás inscrito en «{grupo.nombre}».")
+                else:
+                    Pertenecer.objects.create(numCuenta=request.user, codigo=grupo)
+                    messages.success(request, f"Te has unido al grupo «{grupo.nombre}». Serás redirigido a tus grupos en unos segundos.")
+                    redirigir = True
+            else:
+                messages.error(request, "El código de grupo no es válido.")
+    else:
+        form = GroupJoinForm()
+        codigo = request.GET.get('codigo')
+        if codigo:
+            grupo = buscar_grupo_por_codigo(codigo)
+
+    return render(request, 'grupos/unirseGrupo.html', { 'form': form, 'grupo': grupo, 'redirigir': redirigir })
+
+# Función para crear o editar un grupo
+@staff_member_required
+def crear_o_editar_grupo(request, grupo_id=None):
+    if grupo_id:
+        # editar
+        grupo = Grupo.objects.get(codigo=grupo_id)
+        initial = {
+            'nombre': grupo.nombre,
+            'descripcion': grupo.descripcion,
+        }
+        form = GrupoForm(request.POST or None, request.FILES or None, initial=initial)
+    else:
+        # crear
+        grupo = None
+        form = GrupoForm(request.POST or None, request.FILES or None)
+
+    if request.method == 'POST' and form.is_valid():
+        data = form.cleaned_data
+        if grupo:
+            # actualización
+            grupo.nombre = data['nombre']
+            grupo.descripcion = data['descripcion']
+            if data['foto_portada']:
+                grupo.foto_portada = data['foto_portada']
+            grupo.save()
+            messages.success(request, "Grupo actualizado correctamente.")
+            return redirect('detalle_grupo', grupo_id=grupo.codigo)
+        else:
+            # creación
+            codigo_generado = generar_codigo_grupo()
+            grupo = Grupo.objects.create(
+                nombre=data['nombre'],
+                descripcion=data['descripcion'],
+                foto_portada=data['foto_portada'] or None,
+                codigo_acceso=codigo_generado  # <--- Aquí se guarda el código de acceso
+            )
+            Gestionar.objects.create(numCuenta=request.user, codigo=grupo)
+            messages.success(request, f"Grupo creado correctamente. El código de acceso es: {codigo_generado}")
+
+        return redirect('detalle_grupo', grupo_id=grupo.codigo)
+
+    return render(request, 'grupos/gestionar_grupo.html', {'form': form, 'grupo': grupo,})
+
+# Función para generar un código de grupo aleatorio
+def generar_codigo_grupo(length=7):
+    chars = string.ascii_uppercase + string.digits
+    return ''.join(secrets.choice(chars) for _ in range(length))
+
+# Función para buscar un grupo por su código
+def buscar_grupo_por_codigo(codigo):
+    return Grupo.objects.filter(codigo_acceso=codigo).first()

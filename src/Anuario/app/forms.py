@@ -1,6 +1,6 @@
 from django import forms
 from django.contrib.auth.forms import UserCreationForm
-from .models import Usuario, Perfil, Tener
+from .models import Usuario, Perfil, Grupo, Tener
 
 # Formulario para el registro de un usuario.
 # Cada campo es necesario para la base de datos
@@ -99,3 +99,54 @@ class PerfilForm(forms.ModelForm):
             'foto_portada': 'Foto de portada',
             'biografia': 'Biografía'
         }
+
+# Formulario para unirse a un grupo
+class GroupJoinForm(forms.Form):
+    codigo = forms.CharField(
+        label="Código de grupo",
+        max_length=10,
+        widget=forms.TextInput(attrs={
+            'class': 'form-control',
+            'placeholder': 'Ingresa el código de acceso'
+        })
+    )
+    
+
+# Formulario para grupo
+class GrupoForm(forms.Form):
+    nombre = forms.CharField(
+        max_length=50,
+        label="Nombre del grupo",
+        widget=forms.TextInput(attrs={
+            'class': 'form-control',
+            'placeholder': 'Nombre del grupo'
+        })
+    )
+    descripcion = forms.CharField(
+        required=False,
+        label="Descripción",
+        widget=forms.Textarea(attrs={
+            'class': 'form-control',
+            'rows': 3,
+            'placeholder': 'Descripción del grupo'
+        })
+    )
+    foto_portada = forms.ImageField(
+        required=False,
+        label="Imagen de portada",
+        widget=forms.ClearableFileInput(attrs={
+            'class': 'form-control'
+        })
+    )
+
+    
+
+class DejarComentario(forms.Form):
+    #Input para texto tiene label, texto de ayuda, si es o no requerido y al final el parametro para insertar bootstrap
+    comentario = forms.CharField(
+        label="Comentario:", 
+        help_text="Escribe tu comentario...", 
+        required=False, widget=forms.TextInput(attrs={
+            'class':'form-control', 
+            'placeholder': 'Escribe tu comentario...'
+        }))
