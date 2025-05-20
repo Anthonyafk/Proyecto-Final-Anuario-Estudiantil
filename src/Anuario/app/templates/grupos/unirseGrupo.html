@@ -30,6 +30,13 @@
           </div>
         {% endfor %}
       </div>
+      {% if redirigir %} <!-- Script para redirigir después de un cierto tiempo al mostrar el mensaje -->
+        <script>
+          setTimeout(function() {
+            window.location.href = "{% url 'home' %}";
+          }, 2000);
+        </script>
+      {% endif %}
     {% endif %}
 
     <!-- Para centrar el cont -->

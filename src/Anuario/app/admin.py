@@ -7,3 +7,8 @@ from .models import Grupo, Pertenecer
 @admin.register(Grupo)
 class GrupoAdmin(admin.ModelAdmin):
     list_display = ('codigo', 'nombre',)
+
+# Pertenencia de un usuario a un grupo
+@admin.register(Pertenecer)
+class PertenecerAdmin(admin.ModelAdmin):
+    list_display = ('numCuenta', 'codigo',)

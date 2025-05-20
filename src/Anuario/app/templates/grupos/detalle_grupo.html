@@ -40,7 +40,7 @@ sepa en que vista se encuentra-->
     <div class="card-body"> 
         <div class="p-2 rounded bg-light" style="height: 8rem;">
             <p class="mb-0">
-                Información o descripción del grupo
+                 {{ grupo.descripcion|default:"Sin descripción." }} <!-- Para mostrar la info del grupo q le ponga el admin-->
             </p>
         </div>
     </div>

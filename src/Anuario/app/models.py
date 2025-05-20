@@ -102,6 +102,9 @@ class Usuario(AbstractBaseUser, PermissionsMixin):
         self.full_clean()
         super().save(*args, **kwargs)
 
+# Devuelve el nombre de usuario como cadena y sirve para mostrarlo en la interfaz de administración de Django
+    def __str__(self):
+        return str(self.numCuenta)
 class Perfil(models.Model):
     idPerfil = models.AutoField(primary_key=True)
     foto_perfil = models.ImageField(upload_to='perfil/', blank=True)
@@ -114,7 +117,9 @@ class Grupo(models.Model):
     descripcion = models.TextField(blank=True)
     foto_portada = models.ImageField(upload_to='grupos/',blank=True)
 
-
+# Devuelve el nombre del grupo como cadena y sirve para mostrarlo en la interfaz de administración de Django
+    def __str__(self):
+        return self.nombre
 class Comentario(models.Model):
     idComentario = models.AutoField(primary_key=True)
     idPerfil = models.ForeignKey(Perfil, on_delete=models.CASCADE)
@@ -223,7 +228,12 @@ class Pertenecer(models.Model):
 
     class Meta:
         unique_together = (('numCuenta', 'codigo'),)
+        verbose_name = "Pertenecer"
+        verbose_name_plural = "Pertenecer"  # Para mostrar correctamente el nombre en plural en la interfaz de administración de Django
 
+# Para mostrar correctamente las relaciones de pertenencia en la interfaz de administración de Django
+    def __str__(self):
+        return f"{self.numCuenta} en {self.codigo}"
 
 class Tener(models.Model):
     numCuenta = models.OneToOneField(Usuario, primary_key=True, on_delete=models.CASCADE)

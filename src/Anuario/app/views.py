@@ -217,22 +217,19 @@ def integrantes(request, grupo_id):
 
     return render(request, 'integrantes/integrantes.html', {'grupo': grupo, 'form': form, 'integrantes': integrantes_qs, 'marcos':marcos})
 
-def join_group(request):
+def unirse_grupo(request):
     grupo = None
+    redirigir = False  # para saber si redirigir tras isncripción o no
     if request.method == 'POST':
         form = GroupJoinForm(request.POST)
         if form.is_valid():
-            try:
                 grupo = Grupo.objects.get(codigo=form.cleaned_data['codigo'])
-                #  Evita duplicado en mismo grupo
                 if Pertenecer.objects.filter(numCuenta=request.user, codigo=grupo).exists():
                     messages.warning(request, f"Ya estás inscrito en «{grupo.nombre}».")
                 else:
                     Pertenecer.objects.create(numCuenta=request.user, codigo=grupo)
-                    messages.success(request, f"Te has unido al grupo «{grupo.nombre}».")
-                # Muestra el mensaje en la misma página
-            except Grupo.DoesNotExist:
-                messages.error(request, "El código de grupo no es válido.")
+                    messages.success(request, f"Te has unido al grupo «{grupo.nombre}». Serás redirigido a tus grupos en unos segundos.")
+                    redirigir = True
     else:
         form = GroupJoinForm()
         codigo = request.GET.get('codigo')
@@ -242,4 +239,4 @@ def join_group(request):
             except Grupo.DoesNotExist:
                 grupo = None
 
-    return render(request, 'grupos/unirseGrupo.html', { 'form': form, 'grupo': grupo })
+    return render(request, 'grupos/unirseGrupo.html', { 'form': form, 'grupo': grupo, 'redirigir': redirigir })
