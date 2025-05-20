@@ -1,4 +1,4 @@
-{% extends 'base.html' %}
+{% extends 'common/grupo_base.html' %}
 <!--Muestra en la parte del enlace una pequeña historia para que el usuario
 sepa en que vista se encuentra-->
 {% block title %}Info Grupos{% endblock %}
@@ -40,15 +40,14 @@ sepa en que vista se encuentra-->
     <div class="card shadow-sm mb-4 border-0 bg-secondary bg-opacity-25">  
     <div class="card-body"> 
         <h1 class="display-5 text-dark">
-    <!--Cmabiar por el nombre de los grupos-->
-    {{grupo.nombre}}
+        {{grupo.nombre}}
         </h1>
         {% if user.is_staff %}
         <a href="{% url 'editar_grupo' grupo_id=grupo.codigo %}" class="btn btn-warning mb-3">Editar grupo</a> <!--Boton para editar grupo, solo admin-->
         {% endif %}
     </div>
 </div>
-
+<div class="container-fluid px-4">
     
 <!-- Info grupo-->
 <div class="card shadow mb-4">
@@ -59,9 +58,16 @@ sepa en que vista se encuentra-->
             </p>
         </div>
     </div>
-</div>
 
-    <!-- Comentarios -->
+    {% if publicaciones %}
+        {% for publicacion in publicaciones %}
+            {% include 'common/CardPublicacion.html' with publicacion=publicacion %}
+        {% endfor %}
+    {% else %}
+        <h4 class="py-4 text-center">Aún no hay publicaciones en este grupo.</h4>
+    {% endif %}
+
+    <!-- Comentarios
     <div class="card shadow-sm">
         <div class="card-body">
             <h5 class="mb-3">Deja un comentario</h5>
@@ -69,6 +75,6 @@ sepa en que vista se encuentra-->
                 <div class="mb-3 placeholder" style="height: 6rem;"></div>
             </div>
         </div>
-    </div>
+    </div>-->
 </div>
 {% endblock %}

@@ -102,9 +102,11 @@ class Usuario(AbstractBaseUser, PermissionsMixin):
         self.full_clean()
         super().save(*args, **kwargs)
 
+
 # Devuelve el nombre de usuario como cadena y sirve para mostrarlo en la interfaz de administración de Django
     def __str__(self):
-        return str(self.numCuenta)
+        return str(self.numCuenta) + " - " + self.nombre_usuario + "\n"
+
 class Perfil(models.Model):
     idPerfil = models.AutoField(primary_key=True)
     foto_perfil = models.ImageField(upload_to='perfil/', blank=True)
