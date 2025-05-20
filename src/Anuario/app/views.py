@@ -1,6 +1,6 @@
 from django.shortcuts import render, redirect
 from django.contrib import messages
-from .models import Usuario, Grupo, Comentario, Publicacion, Nominacion, Perfil, Tener, Pertenecer, Postular, Votar, MarcoFoto, Ganar, Comentario # .... etc.
+from .models import Usuario, Grupo, Comentario, Publicacion, Nominacion, Perfil, Tener, Pertenecer, Postular, Votar, MarcoFoto, Ganar, Comentario, Marco # .... etc.
 from .forms import UsuarioRegistroForm, UsuarioBusquedaNominacion, PerfilForm, DejarComentario
 from django.contrib.auth import authenticate, login
 from django.db import IntegrityError
@@ -155,10 +155,11 @@ def editar_perfil(request):
         if form.is_valid():
             marcoElegido = request.POST.get('marco_foto')
             if marcoElegido:
+                marco = Marco.objects.get(idMarco = marcoElegido)
                 marcoUnoAUno = MarcoFoto.objects.filter(idPerfil=perfil)
                 if marcoUnoAUno.exists():
                     marcoUnoAUno.delete()
-                marcofoto = MarcoFoto(idPerfil=perfil, marco_foto=marcoElegido) 
+                marcofoto = MarcoFoto(idPerfil=perfil, marco_foto=marco) 
                 marcofoto.save()
             form.save()
             return redirect('perfil', usuario_id = request.user.numCuenta)  # Redirige al perfil después de editar

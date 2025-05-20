@@ -155,11 +155,14 @@ class Nominacion(models.Model):
             )
         ]
 
-
+class Marco(models.Model):
+    idMarco = models.AutoField(primary_key=True)
+    marco = models.ImageField(upload_to='marco/', blank=True)
+    
 class Ganar(models.Model):
     idNominacion = models.ForeignKey(Nominacion, on_delete=models.CASCADE)
     numCuenta = models.ForeignKey(Usuario, on_delete=models.CASCADE)
-    premio = models.TextField(blank=True)
+    premio = models.ForeignKey(Marco, on_delete=models.CASCADE)
     activa = models.BooleanField(default=True)
 
     class Meta:
@@ -240,7 +243,7 @@ class Postular(models.Model):
 
 class MarcoFoto(models.Model):
     idPerfil = models.ForeignKey(Perfil, on_delete=models.CASCADE)
-    marco_foto = models.TextField()
+    marco_foto = models.ForeignKey(Marco, on_delete=models.CASCADE)
 
     class Meta:
         unique_together = (('idPerfil', 'marco_foto'),)
