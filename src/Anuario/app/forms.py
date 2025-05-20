@@ -102,19 +102,14 @@ class PerfilForm(forms.ModelForm):
 
 # Formulario para unirse a un grupo
 class GroupJoinForm(forms.Form):
-    codigo = forms.IntegerField(
+    codigo = forms.CharField(
         label="Código de grupo",
-        widget=forms.NumberInput(attrs={
+        max_length=10,
+        widget=forms.TextInput(attrs={
             'class': 'form-control',
             'placeholder': 'Ingresa el código de acceso'
         })
     )
-
-    def clean_codigo(self):
-        codigo = self.cleaned_data['codigo']
-        if not Grupo.objects.filter(codigo=codigo).exists():
-            raise forms.ValidationError("Este grupo no existe.")
-        return codigo
     
 
 # Formulario para grupo

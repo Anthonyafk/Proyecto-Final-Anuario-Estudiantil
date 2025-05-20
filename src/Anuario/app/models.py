@@ -112,10 +112,11 @@ class Perfil(models.Model):
     biografia = models.TextField(blank=True)
 
 class Grupo(models.Model):
-    codigo = models.AutoField(primary_key=True)
+    codigo = models.AutoField(primary_key=True) # Es mas un id de grupo que un codigo
     nombre = models.CharField(max_length=50)
     descripcion = models.TextField(blank=True)
     foto_portada = models.ImageField(upload_to='grupos/',blank=True)
+    codigo_acceso = models.CharField(max_length=10, unique=True, blank=True, null=True) # Atributo para el código de acceso al grupo
 
 # Devuelve el nombre del grupo como cadena y sirve para mostrarlo en la interfaz de administración de Django
     def __str__(self):

@@ -1,3 +1,5 @@
+import secrets
+import string
 from django.shortcuts import render, redirect
 from django.contrib import messages
 from .models import Usuario, Grupo, Comentario, Publicacion, Nominacion, Perfil, Tener, Pertenecer, Postular, Votar, MarcoFoto, Ganar, Comentario, Gestionar # .... etc.
@@ -8,8 +10,8 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.admin.views.decorators import staff_member_required
 from datetime import date
 from datetime import datetime
-
 from django.shortcuts import HttpResponse #prueba
+
 def index(request):
     contextosinpretexto = {
     'usuarios': Usuario.objects.all(),
@@ -220,25 +222,26 @@ def integrantes(request, grupo_id):
 
 def unirse_grupo(request):
     grupo = None
-    redirigir = False  # para saber si redirigir tras isncripción o no
+    redirigir = False   # para saber si redirigir tras isncripción o no
     if request.method == 'POST':
         form = GroupJoinForm(request.POST)
         if form.is_valid():
-                grupo = Grupo.objects.get(codigo=form.cleaned_data['codigo'])
+            codigo = form.cleaned_data['codigo']
+            grupo = buscar_grupo_por_codigo(codigo)
+            if grupo:
                 if Pertenecer.objects.filter(numCuenta=request.user, codigo=grupo).exists():
                     messages.warning(request, f"Ya estás inscrito en «{grupo.nombre}».")
                 else:
                     Pertenecer.objects.create(numCuenta=request.user, codigo=grupo)
                     messages.success(request, f"Te has unido al grupo «{grupo.nombre}». Serás redirigido a tus grupos en unos segundos.")
                     redirigir = True
+            else:
+                messages.error(request, "El código de grupo no es válido.")
     else:
         form = GroupJoinForm()
         codigo = request.GET.get('codigo')
         if codigo:
-            try:
-                grupo = Grupo.objects.get(codigo=codigo)
-            except Grupo.DoesNotExist:
-                grupo = None
+            grupo = buscar_grupo_por_codigo(codigo)
 
     return render(request, 'grupos/unirseGrupo.html', { 'form': form, 'grupo': grupo, 'redirigir': redirigir })
 
@@ -271,15 +274,25 @@ def crear_o_editar_grupo(request, grupo_id=None):
             return redirect('detalle_grupo', grupo_id=grupo.codigo)
         else:
             # creación
+            codigo_generado = generar_codigo_grupo()
             grupo = Grupo.objects.create(
                 nombre=data['nombre'],
                 descripcion=data['descripcion'],
-                foto_portada=data['foto_portada'] or None
+                foto_portada=data['foto_portada'] or None,
+                codigo_acceso=codigo_generado  # <--- Aquí se guarda el código de acceso
             )
-            # registrar al admin como gestor
             Gestionar.objects.create(numCuenta=request.user, codigo=grupo)
-            messages.success(request, f"Grupo creado correctamente. El código de acceso es: {grupo.codigo}")
+            messages.success(request, f"Grupo creado correctamente. El código de acceso es: {codigo_generado}")
 
         return redirect('detalle_grupo', grupo_id=grupo.codigo)
 
     return render(request, 'grupos/gestionar_grupo.html', {'form': form, 'grupo': grupo,})
+
+# Función para generar un código de grupo aleatorio
+def generar_codigo_grupo(length=7):
+    chars = string.ascii_uppercase + string.digits
+    return ''.join(secrets.choice(chars) for _ in range(length))
+
+# Función para buscar un grupo por su código
+def buscar_grupo_por_codigo(codigo):
+    return Grupo.objects.filter(codigo_acceso=codigo).first()
