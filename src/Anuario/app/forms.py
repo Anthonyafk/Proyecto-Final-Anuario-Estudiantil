@@ -116,7 +116,36 @@ class GroupJoinForm(forms.Form):
             raise forms.ValidationError("Este grupo no existe.")
         return codigo
     
+
+# Formulario para grupo
+class GrupoForm(forms.Form):
+    nombre = forms.CharField(
+        max_length=50,
+        label="Nombre del grupo",
+        widget=forms.TextInput(attrs={
+            'class': 'form-control',
+            'placeholder': 'Nombre del grupo'
+        })
+    )
+    descripcion = forms.CharField(
+        required=False,
+        label="Descripción",
+        widget=forms.Textarea(attrs={
+            'class': 'form-control',
+            'rows': 3,
+            'placeholder': 'Descripción del grupo'
+        })
+    )
+    foto_portada = forms.ImageField(
+        required=False,
+        label="Imagen de portada",
+        widget=forms.ClearableFileInput(attrs={
+            'class': 'form-control'
+        })
+    )
+
     
+
 class DejarComentario(forms.Form):
     #Input para texto tiene label, texto de ayuda, si es o no requerido y al final el parametro para insertar bootstrap
     comentario = forms.CharField(

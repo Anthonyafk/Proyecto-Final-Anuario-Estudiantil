@@ -4,6 +4,18 @@ sepa en que vista se encuentra-->
 {% block title %}Info Grupos{% endblock %}
 
 {% block content %}
+
+{% if messages %}  <!--Bloque para admitir mensajes de Django-->
+  <div class="container mt-3">
+    {% for message in messages %}
+      <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+        {{ message }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Cerrar"></button>
+      </div>
+    {% endfor %}
+  </div>
+{% endif %}
+
 <div class="container container-fluid px-4 flex-grow-1">
     <!--<div class="d-flex justify-content-between align-items-center py-3 border-bottom">
         <div class="d-flex align-items-center gap-3">
@@ -31,6 +43,9 @@ sepa en que vista se encuentra-->
     <!--Cmabiar por el nombre de los grupos-->
     {{grupo.nombre}}
         </h1>
+        {% if user.is_staff %}
+        <a href="{% url 'editar_grupo' grupo_id=grupo.codigo %}" class="btn btn-warning mb-3">Editar grupo</a> <!--Boton para editar grupo, solo admin-->
+        {% endif %}
     </div>
 </div>
 

@@ -1,10 +1,10 @@
 from django.shortcuts import render, redirect
 from django.contrib import messages
-from .models import Usuario, Grupo, Comentario, Publicacion, Nominacion, Perfil, Tener, Pertenecer, Postular, Votar, MarcoFoto, Ganar, Comentario # .... etc.
-from .forms import UsuarioRegistroForm, UsuarioBusquedaNominacion, PerfilForm, DejarComentario, GroupJoinForm
+from .models import Usuario, Grupo, Comentario, Publicacion, Nominacion, Perfil, Tener, Pertenecer, Postular, Votar, MarcoFoto, Ganar, Comentario, Gestionar # .... etc.
+from .forms import UsuarioRegistroForm, UsuarioBusquedaNominacion, PerfilForm, DejarComentario, GroupJoinForm, GrupoForm
 from django.contrib.auth import authenticate, login
 from django.db import IntegrityError
-from django.contrib.auth.decorators import login_required
+from django.contrib.auth.decorators import login_required, user_passes_test
 from datetime import date
 from datetime import datetime
 
@@ -240,3 +240,49 @@ def unirse_grupo(request):
                 grupo = None
 
     return render(request, 'grupos/unirseGrupo.html', { 'form': form, 'grupo': grupo, 'redirigir': redirigir })
+
+# Función para determinar si el usuario es administrador
+def es_admin(user):
+    return user.is_staff
+
+# Función para crear o editar un grupo
+@login_required
+def crear_o_editar_grupo(request, grupo_id=None):
+    if grupo_id:
+        # editar
+        grupo = Grupo.objects.get(codigo=grupo_id)
+        initial = {
+            'nombre': grupo.nombre,
+            'descripcion': grupo.descripcion,
+        }
+        form = GrupoForm(request.POST or None, request.FILES or None, initial=initial)
+    else:
+        # crear
+        grupo = None
+        form = GrupoForm(request.POST or None, request.FILES or None)
+
+    if request.method == 'POST' and form.is_valid():
+        data = form.cleaned_data
+        if grupo:
+            # actualización
+            grupo.nombre = data['nombre']
+            grupo.descripcion = data['descripcion']
+            if data['foto_portada']:
+                grupo.foto_portada = data['foto_portada']
+            grupo.save()
+            messages.success(request, "Grupo actualizado correctamente.")
+            return redirect('detalle_grupo', grupo_id=grupo.codigo)
+        else:
+            # creación
+            grupo = Grupo.objects.create(
+                nombre=data['nombre'],
+                descripcion=data['descripcion'],
+                foto_portada=data['foto_portada'] or None
+            )
+            # registrar al admin como gestor
+            Gestionar.objects.create(numCuenta=request.user, codigo=grupo)
+            messages.success(request, f"Grupo creado correctamente. El código de acceso es: {grupo.codigo}")
+
+        return redirect('detalle_grupo', grupo_id=grupo.codigo)
+
+    return render(request, 'grupos/gestionar_grupo.html', {'form': form, 'grupo': grupo,})

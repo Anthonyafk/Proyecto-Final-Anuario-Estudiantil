@@ -1,0 +1,56 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container py-4 flex-grow-1">
+  <!-- Navegación -->
+  <div class="d-flex align-items-center py-3">
+      <button class="btn btn-link text-dark me-3 p-0 border-0 bg-transparent" onclick="window.history.back();">
+          <i class="fas fa-arrow-left"></i>
+      </button>
+      {% if grupo %}
+      <nav class="d-flex gap-3">
+          <a href="{% url 'detalle_grupo' grupo_id=grupo.codigo  %}" class="text-dark text-decoration-none">Principal</a>
+          <a href="{% url 'nominaciones' grupo_id=grupo.codigo %}" class="text-dark text-decoration-none">Nominaciones</a>
+          <a href="{% url 'integrantes' grupo_id=grupo.codigo %}" class="text-dark text-decoration-none">Integrantes</a>
+          <a href="#" class="text-dark text-decoration-none">Administración</a>
+      </nav>
+      {% endif %}
+  </div>
+
+  <h2 class="mb-4">
+    {% if grupo %}Editar Grupo{% else %}Crear Grupo{% endif %}
+  </h2>
+  <form method="post" enctype="multipart/form-data" novalidate>
+    {% csrf_token %}
+    <div class="mb-3">
+      {{ form.nombre.label_tag }}
+      {{ form.nombre }}
+      {% for err in form.nombre.errors %}
+        <div class="text-danger">{{ err }}</div>
+      {% endfor %}
+    </div>
+    <div class="mb-3">
+      {{ form.descripcion.label_tag }}
+      {{ form.descripcion }}
+      {% for err in form.descripcion.errors %}
+        <div class="text-danger">{{ err }}</div>
+      {% endfor %}
+    </div>
+    <div class="mb-3">
+      {{ form.foto_portada.label_tag }}
+      {{ form.foto_portada }}
+      {% if grupo and grupo.foto_portada %}
+        <p>Portada actual:</p>
+        <img src="{{ grupo.foto_portada.url }}" width="200">
+      {% endif %}
+      {% for err in form.foto_portada.errors %}
+        <div class="text-danger">{{ err }}</div>
+      {% endfor %}
+    </div>
+    <button type="submit" class="btn btn-primary">
+      {% if grupo %}Guardar cambios{% else %}Crear grupo{% endif %}
+    </button>
+  </form>
+</div>
+{% endblock %}

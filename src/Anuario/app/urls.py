@@ -13,6 +13,8 @@ urlpatterns = [
     path('grupos/<int:grupo_id>/',views.detalle_grupo,name='detalle_grupo'), #ruta anterior pero dinamica
     path('grupos/<int:grupo_id>/integrantes/', views.integrantes, name='integrantes'),
     path('grupos/unirse/', views.unirse_grupo, name='unirseGrupo'),
+    path('grupos/nuevo/', views.crear_o_editar_grupo, name='crear_grupo'),
+    path('grupos/<int:grupo_id>/editar/', views.crear_o_editar_grupo, name='editar_grupo'),
     path("accounts/signup/", views.signup, name="signup"),
     path("accounts/", include("django.contrib.auth.urls")),  # new
     #path("", TemplateView.as_view(template_name="home.html"), name="home")  # new
