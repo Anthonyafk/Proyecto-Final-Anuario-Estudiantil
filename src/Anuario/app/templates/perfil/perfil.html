@@ -42,11 +42,15 @@ sepa en que vista se encuentra-->
   <!-- Nombre de usuario -->
  <div class="text-center mt-5">  <!-- mt-5 para espacio después de la foto -->
     <h2 class="mb-1">{{ usuario.nombre }} {{ usuario.primer_apellido }} {{ usuario.segundo_apellido }}</h2>
+    <!-- Usuario -->
+    <h4 class="mb-1" style="padding: 1%">{{ usuario.nombre_usuario}}</h4>
     <!--Verifica si el que está viendo el perfil es el dueño de la cuenta, de ser 
     así muestra el botón de "editar perfil"-->
     {% if request.user.numCuenta == usuario.numCuenta %}
       <a href="{% url 'editar_perfil' %}" class="btn btn-primary">Editar Perfil</a>
     {% endif %}
+    
+    {{marco.marco_foto}}
   </div>
 </div>
       
@@ -62,6 +66,19 @@ sepa en que vista se encuentra-->
       </div>
       
          </div>  
+         <!-- Sección de Dedicatorias -->
+         <div>
+           <!-- Botón añadir comentario -->
+           {% if request.user.numCuenta != usuario.numCuenta %}
+           <div style="display: flex; margin-bottom:2%;">
+            <a href="{% url 'add_comentario' perfil.idPerfil %}" class="btn btn-primary" style="margin-left: auto;">Añadir Comentario</a>
+           </div>
+           {% endif %}
+            <!-- Comentarios -->
+            {% for comentario in comentarios %}
+              {% include 'common/CardComentarios.html' %}
+            {% endfor%}
+         </div>
   {% else %}
     <div class="container mt-5">
       <div class="alert alert-warning text-center">
@@ -72,3 +89,4 @@ sepa en que vista se encuentra-->
   {% endif %}
 </div>  
 {% endblock %}
+<br>

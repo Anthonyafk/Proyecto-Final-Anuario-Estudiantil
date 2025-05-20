@@ -94,7 +94,7 @@ DATABASES = {
     'ENGINE': 'django.db.backends.postgresql',
     'NAME': 'anuario',
 	'USER': 'postgres',
-	'PASSWORD': 'Slayer_45!',
+	'PASSWORD': '117007',
 	'HOST': 'localhost',
 	'PORT': '5432',
     }
@@ -137,7 +137,7 @@ USE_TZ = True
 
 STATIC_URL = 'static/'
 STATICFILES_DIRS = [
-    os.path.join(BASE_DIR, 'static')
+    os.path.join(BASE_DIR, 'app', 'static')
 ]
 
 MEDIA_URL = 'media/'

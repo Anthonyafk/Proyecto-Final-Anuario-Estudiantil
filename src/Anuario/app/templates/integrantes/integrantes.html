@@ -4,34 +4,50 @@
 
 {% block title %}Integrantes{% endblock %}
 
-{% block grupo_content %}
-<div class="container px-4">
-  <!-- Título del grupo -->
-  <div class="row">
-    <div class="col-4">
-    <h2>Integrantes de {{ grupo.nombre }}</h2>
+{% block content %}
+<div class="container container-fluid px-4 flex-grow-1">
+    <!-- Navegación -->
+    <div class="d-flex align-items-center py-3">
+        <button class="btn btn-link text-dark me-3 p-0 border-0 bg-transparent" onclick="window.history.back();">
+            <i class="fas fa-arrow-left"></i>
+        </button>
+        <!-- Ir llenando conforme se completen las vistas -->
+        <nav class="d-flex gap-3">
+            <a href="{% url 'detalle_grupo' grupo_id=grupo.codigo  %}" class="text-dark text-decoration-none">Principal</a>
+            <a href="{% url 'nominaciones' grupo_id=grupo.codigo %}" class="text-dark text-decoration-none">Nominaciones</a>
+            <a href="{% url 'integrantes' grupo_id=grupo.codigo %}" class="text-dark text-decoration-none">Integrantes</a>
+            <a href="#" class="text-dark text-decoration-none">Administración</a>
+        </nav>
     </div>
-  <!-- Formulario de búsqueda -->
-  <div class="col">
-  <form method="get" class="my-3">
-    <div class="input-group">
-      {{ form.nombre|add_class:"form-control" | attr:"placeholder:Buscar Estudiante..." }}
-      <button type="submit" class="btn btn-outline-secondary">
-        <i class="fas fa-search"></i>
-      </button>
+
+    <!-- Contenido central debajo de la navbar -->
+    <div class="py-4">
+      <!-- Título del grupo -->
+      <div class="row">
+        <div class="col-4">
+          <h2>Integrantes de {{ grupo.nombre }}</h2>
+        </div>
+        <!-- Formulario de búsqueda -->
+        <div class="col">
+          <form method="get" class="my-3">
+            <div class="input-group">
+              {{ form.nombre|add_class:"form-control" | attr:"placeholder:Buscar Estudiante..." }}
+              <button type="submit" class="btn btn-outline-secondary">
+                <i class="fas fa-search"></i>
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+
+      <!-- Lista de integrantes -->
+      <div class="list-group">
+        {% for integrante in integrantes %}
+          {% include 'common/CardIntegrante.html' with integrante=integrante %}
+        {% empty %}
+          <div class="text-muted">No hay integrantes.</div>
+        {% endfor %}
+      </div>
     </div>
-  </form>
-  </div>
-  </div>
-
-  <!-- Lista de integrantes -->
-  <div class="list-group">
-    {% for integrante in integrantes %}
-      {% include 'common/CardIntegrante.html' with integrante=integrante %}
-    {% empty %}
-      <div class="text-muted">No hay integrantes.</div>
-    {% endfor %}
-  </div>
-
 </div>
 {% endblock %}

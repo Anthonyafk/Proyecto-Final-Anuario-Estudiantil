@@ -31,11 +31,18 @@
         </form>
         
         <!-- Enlace -->
-        <button class="btn btn-outline-success">Ingresar a un Grupo</button>
+        <a href="{% url 'unirseGrupo' %}" class="btn btn-outline-success">Ingresar a un Grupo</a>
+        {% if user.is_staff %}
+          <a href="{% url 'crear_grupo' %}" class="btn btn-outline-primary">Crear nuevo grupo</a> <!--Boton para crear grupo, solo admin-->
+        {% endif %}
         <!-- Ícono de usuario -->
         <button class="btn btn-outline-secondary rounded-circle d-flex align-items-center justify-content-center" style="width: 36px; height: 36px;">
-          <a class="text-dark" href={% url 'perfil' user.numCuenta%}>
-            <i class="bi bi-person"></i>
+          <a class="text-dark" href="{% url 'perfil' user.numCuenta %}">   <!-- Ícono de usuario o foto de perfil -->
+            {% if user.tener.idPerfil.foto_perfil %}
+              <img src="{{ user.tener.idPerfil.foto_perfil.url }}" alt="Foto de perfil" class="rounded-circle" style="width: 32px; height: 32px; object-fit: cover;">
+            {% else %}
+              <i class="bi bi-person"></i>
+            {% endif %}
           </a>
         </button>
       </div>

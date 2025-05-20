@@ -14,18 +14,30 @@ sepa en que vista se encuentra-->
                 {% csrf_token %}
                 
                 <div class="mb-3">
-                   <label class="form-label">Foto de perfil</label>
+                   <label class="form-label">Foto de perfil:</label>
                      <input type="file" class="form-control" name="foto_perfil" accept="image/*">
                 </div>
 
                 <div class="mb-3">
-                    <label class="form-label">Foto de portada</label>
+                    <label class="form-label">Foto de portada:</label>
                       <input type="file" class="form-control" name="foto_portada" accept="image/*">
                 </div>
                 
                 <div class="mb-3">
                     <label class="form-label">{{ form.biografia.label }}</label>
                     {{ form.biografia }}
+                </div>
+                
+                <div class="mb-3">
+                    <label class="form-label">Marcos de perfil: </label>
+                    <br>
+                    {% if marcos%}
+                      {%for marco in marcos%}
+                        <input class="form-check-input" type="radio" name="marco_foto" value="{{marco.premio}}" style="margin-left:2%"> {{marco.premio}}
+                      {% endfor %}
+                    {% else %}
+                      <p class="mb-1" style="padding: 1%"> No tienes marcos de perfil disponibles.</p>
+                    {% endif %}
                 </div>
                 
                 <button type="submit" class="btn btn-primary">Guardar Cambios</button>

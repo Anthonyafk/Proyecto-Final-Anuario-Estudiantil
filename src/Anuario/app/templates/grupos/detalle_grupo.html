@@ -3,24 +3,59 @@
 sepa en que vista se encuentra-->
 {% block title %}Info Grupos{% endblock %}
 
-{% block grupo_content %}
-<!-- Nombre del grupo -->
-<div class="card shadow-sm mb-4 border-0 bg-secondary bg-opacity-25">  
+{% block content %}
+
+{% if messages %}  <!--Bloque para admitir mensajes de Django-->
+  <div class="container mt-3">
+    {% for message in messages %}
+      <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+        {{ message }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Cerrar"></button>
+      </div>
+    {% endfor %}
+  </div>
+{% endif %}
+
+<div class="container container-fluid px-4 flex-grow-1">
+    <!--<div class="d-flex justify-content-between align-items-center py-3 border-bottom">
+        <div class="d-flex align-items-center gap-3">
+        </div>
+    </div>-->
+
+    <!-- Navegación -->
+    <div class="d-flex align-items-center py-3">
+        <button class="btn btn-link text-dark me-3 p-0 border-0 bg-transparent " onclick="window.history.back();">  <!-- Para flechita funcional -->
+            <i class="fas fa-arrow-left"></i>
+        </button>
+        <!--Cuando se tengan las demás vistas completar estos campos para redirigir a otra vista-->
+        <nav class="d-flex gap-3">
+            <a href="{% url 'home' %}" class="text-dark text-decoration-none">Principal</a>
+            <a href="{% url 'nominaciones'  grupo_id=grupo.codigo %}" class="text-dark text-decoration-none">Nominaciones</a>
+            <a href="{% url 'integrantes' grupo_id=grupo.codigo %}" class="text-dark text-decoration-none">Integrantes</a>
+            <a href="#" class="text-dark text-decoration-none">Administración</a>
+        </nav>
+    </div>
+
+    <!-- Nombre del grupo -->
+    <div class="card shadow-sm mb-4 border-0 bg-secondary bg-opacity-25">  
     <div class="card-body"> 
         <h1 class="display-5 text-dark">
         {{grupo.nombre}}
         </h1>
+        {% if user.is_staff %}
+        <a href="{% url 'editar_grupo' grupo_id=grupo.codigo %}" class="btn btn-warning mb-3">Editar grupo</a> <!--Boton para editar grupo, solo admin-->
+        {% endif %}
     </div>
 </div>
 <div class="container-fluid px-4">
     
-    <div class="card shadow mb-4">
-        <div class="card-body"> 
-            <div class="p-2 rounded bg-light" style="height: 4rem;">
-                <p class="mb-0">
-                {{grupo.descripcion}}
-                </p>
-            </div>
+<!-- Info grupo-->
+<div class="card shadow mb-4">
+    <div class="card-body"> 
+        <div class="p-2 rounded bg-light" style="height: 8rem;">
+            <p class="mb-0">
+                 {{ grupo.descripcion|default:"Sin descripción." }} <!-- Para mostrar la info del grupo q le ponga el admin-->
+            </p>
         </div>
     </div>
 
