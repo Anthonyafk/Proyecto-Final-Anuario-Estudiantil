@@ -1,6 +1,6 @@
 from django import forms
 from django.contrib.auth.forms import UserCreationForm
-from .models import Usuario, Perfil, Tener
+from .models import Usuario, Perfil, Grupo, Tener
 
 # Formulario para el registro de un usuario.
 # Cada campo es necesario para la base de datos
@@ -99,3 +99,19 @@ class PerfilForm(forms.ModelForm):
             'foto_portada': 'Foto de portada',
             'biografia': 'Biografía'
         }
+
+# Formulario para unirse a un grupo
+class GroupJoinForm(forms.Form):
+    codigo = forms.IntegerField(
+        label="Código de grupo",
+        widget=forms.NumberInput(attrs={
+            'class': 'form-control',
+            'placeholder': 'Ingresa el código de acceso'
+        })
+    )
+
+    def clean_codigo(self):
+        codigo = self.cleaned_data['codigo']
+        if not Grupo.objects.filter(codigo=codigo).exists():
+            raise forms.ValidationError("Este grupo no existe.")
+        return codigo

@@ -1,0 +1,53 @@
+{% extends 'base.html' %}
+{% load widget_tweaks %}
+{% block content %}
+<div class="container container-fluid px-4 flex-grow-1">
+    <!-- Navegación -->
+    <div class="d-flex align-items-center py-3">
+        <button class="btn btn-link text-dark me-3 p-0 border-0 bg-transparent" onclick="window.history.back();">
+            <i class="fas fa-arrow-left"></i>
+        </button>
+        <nav class="d-flex gap-3">
+            <a href="{% url 'home' %}" class="text-dark text-decoration-none">Principal</a>
+            {% if grupo %}
+                <a href="{% url 'nominaciones' grupo_id=grupo.codigo %}" class="text-dark text-decoration-none">Nominaciones</a>
+                <a href="{% url 'integrantes' grupo_id=grupo.codigo %}" class="text-dark text-decoration-none">Integrantes</a>
+            {% else %}
+                <span class="text-muted text-decoration-none">Nominaciones</span>
+                <span class="text-muted text-decoration-none">Integrantes</span>
+            {% endif %}
+            <a href="#" class="text-dark text-decoration-none">Administración</a>
+        </nav>
+    </div>
+
+    <!-- Mensajes de Django -->
+    {% if messages %}
+      <div class="container mt-3">
+        {% for message in messages %}
+          <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Cerrar"></button>
+          </div>
+        {% endfor %}
+      </div>
+    {% endif %}
+
+    <!-- Para centrar el cont -->
+    <div class="d-flex flex-column align-items-center py-4">
+      <h2 class="mb-4 text-center">Unirse a un grupo</h2>
+      <form method="post" class="w-100" style="max-width: 400px;">
+        {% csrf_token %}
+        <div class="mb-3">
+          {{ form.codigo|add_class:"form-control text-center" }}
+          {% if form.codigo.errors %}
+            <div class="text-danger small mt-1">{{ form.codigo.errors.0 }}</div>
+          {% endif %}
+        </div>
+        <div class="d-flex justify-content-between">
+          <button type="submit" class="btn btn-success w-50 me-2">Unirse al grupo</button>
+          <a href="{% url 'home' %}" class="btn btn-link w-50 text-center">Cancelar</a>
+        </div>
+      </form>
+    </div>
+</div>
+{% endblock %}
