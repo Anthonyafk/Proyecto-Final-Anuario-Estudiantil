@@ -1,45 +1,30 @@
-{% extends 'base.html' %}
+{% extends 'common/grupo_base.html' %}
 
 {% block title %}Nominaciones{% endblock %}
 
-{% block content %}
-<div class="container container-fluid px-4 flex-grow-1">
-    <!-- Navegación -->
-    <div class="d-flex align-items-center py-3">
-        <button class="btn btn-link text-dark me-3 p-0 border-0 bg-transparent">
-            <i class="fas fa-arrow-left"></i>
-        </button>
-        <!--Cuando se tengan las demás vistas completar estos campos para redirigir a otra vista-->
-        <nav class="d-flex gap-3">
-            <a href="{% url 'detalle_grupo' grupo_id=grupo  %}" class="text-dark text-decoration-none">Principal</a>
-            <a href="#" class="text-dark text-decoration-none">Nominaciones</a>
-            <a href="{% url 'integrantes' grupo_id=grupo %}" class="text-dark text-decoration-none">Integrantes</a>
-            <a href="#" class="text-dark text-decoration-none">Administración</a>
-        </nav>
-    </div>
-
+{% block grupo_content %}
+<div class="container-fluid px-4">
     <!-- Seccion nominaciones -->
     <div class="card shadow-sm mb-4 border-0 bg-secondary bg-opacity-25">  
-    <div class="card-body"> 
-        <h1 class="display-5 text-dark">
-    Nominaciones
-        </h1>
+        <div class="card-body"> 
+            <h1 class="display-5 text-dark">Nominaciones</h1>
+        </div>
     </div>
-</div>
 
- <!-- Listado de nominaciones -->
-<div class="container flex-grow-1  py-4">
-  <div class="row">
-	<div class="flex-grow-1">
-		<div class="container py-4">
-			<div class="container">
-				{%for nominacion in nominaciones %}
-					{% include 'common/CardNominacion.html' %}
-				{% endfor %}
-			</div>
-		</div>
-	</div>
-
+    <!-- Listado de nominaciones -->
+    <div class="py-4">
+        <div class="row">
+	          <div class="flex-grow-1">
+		            <div class="container">
+			              <div class="container">
+				                {%for nominacion in nominaciones %}
+					                  {% include 'common/CardNominacion.html' %}
+				                {% endfor %}
+			              </div>
+		            </div>
+	          </div>
+        </div>
+    </div>
 </div>
 
 {% endblock %}

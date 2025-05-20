@@ -1,0 +1,48 @@
+<div class="card mb-4 shadow-sm">
+	<div class="card-body">
+		<!-- Encabezado con foto y username -->
+		<div class="d-flex justify-content-between align-items-center mb-2">
+        <div class="d-flex align-items-center">
+		        <!-- Imagen de perfil en círculo -->
+            {% if publicacion.numCuenta.tener.idPerfil.foto_perfil %}
+					      <img src="{{ publicacion.numCuenta.tener.idPerfil.foto_perfil.url }}" alt="Foto perfil"
+              	        class="rounded-circle me-2" width="40" height="40" style="object-fit: cover;">
+            {% else %}
+                <div class="bg-secondary text-white rounded-circle d-flex justify-content-center align-items-center me-2"
+                    style="width: 40px; height: 40px;">
+                    <i class="fas fa-user"></i>
+                </div>
+            {% endif %}
+            <strong>{{ publicacion.numCuenta.nombre_usuario }}</strong>
+        </div>
+            <small class="text-muted"> {{ publicacion.fecha_creacion }} {{ publicacion.hora_creacion|time:"H:i" }}</small>
+        </div>
+
+        <!-- Descripción -->
+        {% if publicacion.descripcion %}
+            <p class="mb-3">"{{ publicacion.descripcion }}"</p>
+        {% endif %}
+
+        <!-- Imagen -->
+        {% if publicacion.imagen %}
+            <div class="mb-3">
+                <img src="{{ publicacion.imagen.url }}" alt="Imagen de la publicación" class="img-fluid rounded">
+            </div>
+        {% endif %}
+
+        <!-- Video -->
+        {% if publicacion.video_url %}
+            <div class="mb-3">
+                <div class="ratio ratio-16x9">
+                    <iframe src="{{ publicacion.video_url }}" frameborder="0" allowfullscreen></iframe>
+                </div>
+            </div>
+        {% endif %}
+
+        <!-- Comentarios (placeholder) -->
+            <div class="bg-light rounded-pill px-3 py-2 d-flex justify-content-between align-items-center">
+                <span class="text-muted">Dejar un comentario</span>
+                <i class="fas fa-chevron-right text-muted"></i>
+            </div>
+        </div>
+    </div>

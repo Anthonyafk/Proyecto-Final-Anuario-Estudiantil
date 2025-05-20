@@ -1,6 +1,6 @@
 from django.shortcuts import render, redirect
 from django.contrib import messages
-from .models import Usuario, Grupo, Comentario, Publicacion, Nominacion, Perfil, Tener, Pertenecer, Postular, Votar # .... etc.
+from .models import Usuario, Grupo, Comentario, Publicacion, Nominacion, Perfil, Tener, Pertenecer, Postular, Votar, Gestionar# .... etc.
 from .forms import UsuarioRegistroForm, UsuarioBusquedaNominacion, PerfilForm
 from django.contrib.auth import authenticate, login
 from django.db import IntegrityError
@@ -46,12 +46,16 @@ def signup(request):
 @login_required
 def home(request):
     grupos = []
+    usuario = request.user
+    print(usuario)
     try:
-        grupos_p = Pertenecer.objects.filter(numCuenta=request.user)
+        if usuario.is_superuser:
+            grupos_u = Gestionar.objects.filter(numCuenta=usuario)
+        else:
+            grupos_u = Pertenecer.objects.filter(numCuenta=usuario)
     except:
-        grupos_p = []
-    print(grupos_p)
-    for g in grupos_p:
+        grupos_u = []
+    for g in grupos_u:
         print(f"g.codigo: {g.codigo}")
         grupos.append(g.codigo)
     print(grupos)
@@ -59,8 +63,9 @@ def home(request):
 
 #Esta funcion esta disponible sii existe al menos un grupo en la vista home
 def nominaciones(request,grupo_id):
+    grupo = Grupo.objects.get(codigo=grupo_id)
     nominaciones = Nominacion.objects.filter(activa=True,existe__codigo__codigo=grupo_id)
-    return render(request, "nomination/all-nominations.html", {'nominaciones': nominaciones,'grupo':grupo_id})
+    return render(request, "nomination/all-nominations.html", {'nominaciones': nominaciones,'grupo':grupo})
 
 #Función para mostrar la descripción de la nominación, junto con los estudiantes a votar y el botón para postularse
 def verNominacion(request, idNominacion):
@@ -155,7 +160,15 @@ def editar_perfil(request):
 # podemos cambiar por def detalle_grupo(request, grupo_id):
 def detalle_grupo(request, grupo_id):
     grupo = Grupo.objects.get(codigo=grupo_id)
-    return render(request, 'grupos/detalle_grupo.html', {'grupo': grupo} )  # Justo probe lo que comentabas :), funciona
+    publicaciones = Publicacion.objects.filter(
+        numCuenta__in=Pertenecer.objects.filter(
+            codigo__codigo=grupo_id
+        ).values_list('numCuenta', flat=True)
+    ).order_by('-fecha_creacion', '-hora_creacion')
+    return render(request, 'grupos/detalle_grupo.html', {
+        'grupo': grupo,
+        'publicaciones' : publicaciones
+    })
 
 
 
@@ -178,3 +191,62 @@ def integrantes(request, grupo_id):
         )
 
     return render(request, 'integrantes/integrantes.html', {'grupo': grupo, 'form': form, 'integrantes': integrantes_qs,})
+
+def ad_alumnos(request,grupo_id):
+    grupo = Grupo.objects.get(codigo=grupo_id)
+    pertenencias = Pertenecer.objects.filter(codigo__codigo=grupo_id)
+    alumnos = Usuario.objects.filter(
+        numCuenta__in=pertenencias.values_list('numCuenta', flat=True)
+    )
+
+    # Filtro
+    form = UsuarioBusquedaNominacion(request.GET or None)
+    if form.is_valid() and form.cleaned_data.get('nombre'):
+        termino = form.cleaned_data['nombre']
+        alumnos = (
+            alumnos.filter(nombre__icontains=termino) |
+            alumnos.filter(primer_apellido__icontains=termino) |
+            alumnos.filter(segundo_apellido__icontains=termino)
+        )
+    return render(request, 'admin/admin_alumnos.html', {
+        'alumnos': alumnos,
+        'form' : form,
+        'grupo' : grupo
+    })
+
+def get_publicaciones(grupo_id):
+    publicaciones = Publicacion.objects.filter(
+        numCuenta__in=Pertenecer.objects.filter(
+            codigo__codigo=grupo_id
+        ).values_list('numCuenta', flat=True)
+    ).order_by('-fecha_creacion', '-hora_creacion')  # Opcional: más recientes primero
+
+def ad_publicaciones(request, grupo_id):
+    # Subconsulta: obtener publicaciones de alumnos que pertenecen al grupo
+    grupo = Grupo.objects.get(codigo=grupo_id)
+    publicaciones = get_publicaciones(grupo_id)
+
+    return render(request, 'admin/admin_publicaciones.html', {
+        'publicaciones': publicaciones,
+        'grupo' : grupo
+    })
+
+def ad_comentarios(request, grupo_id):
+    # Obtener publicaciones del grupo
+    publicaciones = get_publicaciones(grupo_id)
+    if publicaciones:
+        publicaciones_ids = publicaciones.values_list('idPublicacion', flat=True)
+        # Obtener comentarios relacionados usando la tabla intermedia Poseer
+        comentarios = Comentario.objects.filter(
+            idcomentario__in=Poseer.objects.filter(
+                idPublicacion__in=publicaciones_ids
+            ).values_list('idComentario', flat=True)
+        ).order_by('-fecha_creacion', '-hora_creacion')  # Si tu modelo Comentario tiene estos campos
+    else:
+        comentarios = []
+
+    grupo = Grupo.objects.get(codigo=grupo_id)
+    return render(request, 'admin/admin_comentarios.html', {
+        'grupo' : grupo,
+        'comentarios' : comentarios
+    })
