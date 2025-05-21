@@ -1,0 +1,34 @@
+{% extends 'common/grupo_base.html' %}
+{% load widget_tweaks %}
+
+{% block grupo_content %}
+<div class="d-flex flex-column align-items-center py-4">
+  <h4 class="mb-4 text-center">Realizar una publicación</h4>
+  <form method="POST" enctype="multipart/form-data" class="w-100" style="max-width: 600px;">
+    {% csrf_token %}
+    
+    <div class="mb-3 position-relative">
+      Agregar una descripción:
+      {{ form.descripcion }}
+      {% if form.descripcion.errors %}
+        <div class="text-danger small mt-1">{{ form.descripcion.errors.0 }}</div>
+      {% endif %}
+    </div>
+
+    <div class="mb-3 position-relative">
+      Agregar una imagen:
+      {{ form.imagen }}
+    </div>
+
+    <div class="row mt-4">
+      <div class="col-6 pe-1">
+        <button type="submit" class="btn btn-success w-100 rounded-pill py-2 fw-bold">Publicar</button>
+      </div>
+      <div class="col-6 ps-1">
+        <a href="{% url 'detalle_grupo' grupo_id=grupo.codigo %}" class="btn btn-outline-secondary w-100 rounded-pill py-2 fw-bold">Cancelar</a>
+      </div>
+    </div>
+  </form>
+</div>
+{% endblock %}
+

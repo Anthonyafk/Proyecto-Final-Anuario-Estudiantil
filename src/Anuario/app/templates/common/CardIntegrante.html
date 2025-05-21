@@ -1,4 +1,5 @@
 {% load static %}
+{% load sweetify %}
 
 <div class="d-flex flex-column flex-sm-row align-items-center justify-content-between py-2 border-bottom">
   <!-- Avatar e información personal -->
@@ -21,11 +22,35 @@
 
   <!-- Botones de acción -->
   <div class="d-flex align-items-center gap-2">
-    <button class="btn btn-sm btn-light" aria-label="Más opciones"> <!-- Posible actualización a futuro -->
-      <i class="fas fa-ellipsis-h"></i>
-    </button>
-    <a href="mailto:{{ integrante.correoE }}" class="btn btn-sm btn-light" aria-label="Enviar correo">
-      <i class="fas fa-envelope"></i>
-    </a>
+    {% if user.is_superuser %}
+      <button class="btn btn-danger" onclick="confirmExpulsion('{% url 'expulsar_alumno' grupo_id=grupo.codigo numCuenta=integrante.numCuenta %}')">
+        <i class="fas fa-trash-alt me-1"></i> Expulsar
+      </button>
+    {% else %}   
+      <a href="mailto:{{ integrante.correoE }}" class="btn btn-sm btn-light" aria-label="Enviar correo">
+        <i class="fas fa-envelope"></i>
+      </a>
+    {% endif %}
   </div>
 </div>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <script>
+    function confirmExpulsion(redirectUrl) {
+        Swal.fire({
+            title: '¿Estás seguro?',
+            text: "Esta acción expulsará al usuario.",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#d33',
+            cancelButtonColor: '#6c757d',
+            confirmButtonText: 'Sí, expulsar',
+            cancelButtonText: 'Cancelar'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                window.location.href = redirectUrl;
+            }
+        });
+    }
+  </script>
+
+{% sweetify %}

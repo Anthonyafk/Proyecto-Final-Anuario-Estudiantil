@@ -1,9 +1,10 @@
 import secrets
 import string
-from django.shortcuts import render, redirect
+import sweetify
+from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
 from .models import Usuario, Grupo, Comentario, Publicacion, Nominacion, Perfil, Tener, Pertenecer, Postular, Votar, MarcoFoto, Ganar, Comentario, Gestionar, Poseer # .... etc.
-from .forms import UsuarioRegistroForm, UsuarioBusquedaNominacion, PerfilForm, DejarComentario, GroupJoinForm, GrupoForm
+from .forms import UsuarioRegistroForm, UsuarioBusquedaNominacion, PerfilForm, DejarComentario, GroupJoinForm, GrupoForm, PublicacionForm
 from django.contrib.auth import authenticate, login
 from django.db import IntegrityError
 from django.contrib.auth.decorators import login_required
@@ -189,26 +190,50 @@ def comentarioPerfil(request, idPerfil):
             return redirect('perfil', usuario_id = usuario.numCuenta.numCuenta)
         else:
             nota="No se puede publicar un comentario vacio."
-    
     return render(request, 'common/dejarComentario.html', {'formComentar': formComentar, 'usuario':usuario, 'nota':nota})
 
-
+def alerta_grupo(request):
+    sweetify.warning(
+        request,
+        'Acceso denegado',
+        text='No perteneces a este grupo.',
+        persistent='OK'
+    )
+    return redirect('home')
 #Funnción para ver la información de los grupos
 # Al tener la otra pantalla (donde salen los grupos) podemos acceder al grupo mediante
 # su id, como por ahora es la segunda vista, solo se muestra la base de la vista sin 
 # datos.
 # podemos cambiar por def detalle_grupo(request, grupo_id):
+@login_required
 def detalle_grupo(request, grupo_id):
     grupo = Grupo.objects.get(codigo=grupo_id)
-    return render(request, 'grupos/detalle_grupo.html', {'grupo': grupo} )  # Justo probe lo que comentabas :), funciona
+    pertenece = Pertenecer.objects.filter(
+        codigo=grupo,
+        numCuenta = request.user
+    )
+    gestiona = Gestionar.objects.filter(
+        codigo=grupo,
+        numCuenta=request.user
+    )
+    publicaciones = get_publicaciones(request, grupo_id)
 
-# Función para ver los integrantes de un grupo
-def integrantes(request, grupo_id):
+    if request.user.is_superuser:
+        if not gestiona:
+            return alerta_grupo(request)
+    else:
+        if not pertenece:
+            return alerta_grupo(request)
+
+    return render(request, 'grupos/detalle_grupo.html', {
+        'grupo': grupo,
+        'publicaciones' : publicaciones,
+    })
+
+def revisar_integrantes(request, grupo_id):
     pertenencias = Pertenecer.objects.filter(codigo__codigo=grupo_id)
     grupo = Grupo.objects.get(codigo=grupo_id)
-    
     marcos = MarcoFoto.objects.all()
-    
     integrantes_qs = Usuario.objects.filter(
         numCuenta__in=pertenencias.values_list('numCuenta', flat=True)
     )
@@ -222,42 +247,90 @@ def integrantes(request, grupo_id):
             integrantes_qs.filter(primer_apellido__icontains=termino) |
             integrantes_qs.filter(segundo_apellido__icontains=termino)
         )
+    return (grupo, form, integrantes_qs, marcos)
 
-    return render(request, 'integrantes/integrantes.html', {'grupo': grupo, 'form': form, 'integrantes': integrantes_qs, 'marcos':marcos})
-
-def ad_alumnos(request,grupo_id):
-    grupo = Grupo.objects.get(codigo=grupo_id)
-    pertenencias = Pertenecer.objects.filter(codigo__codigo=grupo_id)
-    alumnos = Usuario.objects.filter(
-        numCuenta__in=pertenencias.values_list('numCuenta', flat=True)
-    )
-
-    # Filtro
-    form = UsuarioBusquedaNominacion(request.GET or None)
-    if form.is_valid() and form.cleaned_data.get('nombre'):
-        termino = form.cleaned_data['nombre']
-        alumnos = (
-            alumnos.filter(nombre__icontains=termino) |
-            alumnos.filter(primer_apellido__icontains=termino) |
-            alumnos.filter(segundo_apellido__icontains=termino)
-        )
+# Función para ver los integrantes de un grupo
+def integrantes(request, grupo_id):
+    grupo, form, integrantes_qs, marcos = revisar_integrantes(request, grupo_id)
+    print(integrantes_qs)
     return render(request, 'admin/admin_alumnos.html', {
-        'alumnos': alumnos,
-        'form' : form,
-        'grupo' : grupo
+        'grupo': grupo,
+        'form': form,
+        'integrantes': integrantes_qs,
+        'marcos':marcos
     })
 
-def get_publicaciones(grupo_id):
+def publicar(request, grupo_id):
+    grupo = Grupo.objects.get(codigo=grupo_id)
+
+    if request.method == 'POST':
+        form = PublicacionForm(request.POST, request.FILES)
+        if form.is_valid():
+            data = form.cleaned_data
+            fecha_creacion = date.today()
+            now = datetime.now()
+
+            publicacion = Publicacion.objects.create(
+                numCuenta=request.user,
+                fecha_creacion=fecha_creacion,
+                hora_creacion=now.time(),
+                descripcion=data['descripcion'],
+                imagen=data.get('imagen'),
+                video_url=None
+            )
+
+            sweetify.success(
+                request,
+                '¡Publicación realizada!',
+                text='Tu publicación se ha guardado exitosamente.',
+                persistent='Aceptar'
+            )
+
+            return redirect('detalle_grupo', grupo_id=grupo.codigo)
+    else:
+        form = PublicacionForm()
+
+    return render(request, 'grupos/publicar.html', {
+        'grupo': grupo,
+        'form': form
+    })
+
+def expulsar_alumno(request, grupo_id, numCuenta):
+    pertenencia = get_object_or_404(Pertenecer, codigo__codigo=grupo_id, numCuenta__numCuenta=numCuenta)
+    pertenencia.delete()
+
+    sweetify.success(request, 'Alumno expulsado', text='El alumno ha sido eliminado del grupo.', persistent='OK')
+    return redirect('ad_alumnos', grupo_id=grupo_id)
+
+@staff_member_required
+def ad_alumnos(request,grupo_id):
+    grupo, form, integrantes_qs, marcos = revisar_integrantes(request, grupo_id)
+    print(integrantes_qs)
+    return render(request, 'admin/admin_alumnos.html', {
+        'grupo': grupo,
+        'form': form,
+        'integrantes': integrantes_qs,
+        'marcos':marcos
+    })
+
+def get_publicaciones(request, grupo_id):
+    publicaciones = []
     publicaciones = Publicacion.objects.filter(
+        numCuenta__in=Gestionar.objects.filter(
+            codigo__codigo=grupo_id
+        ).values_list('numCuenta', flat=True)
+    ).order_by('-fecha_creacion', '-hora_creacion')
+    publicaciones |= Publicacion.objects.filter(
         numCuenta__in=Pertenecer.objects.filter(
             codigo__codigo=grupo_id
         ).values_list('numCuenta', flat=True)
-    ).order_by('-fecha_creacion', '-hora_creacion')  # Opcional: más recientes primero
+    ).order_by('-fecha_creacion', '-hora_creacion')
+    return publicaciones
 
 def ad_publicaciones(request, grupo_id):
     # Subconsulta: obtener publicaciones de alumnos que pertenecen al grupo
     grupo = Grupo.objects.get(codigo=grupo_id)
-    publicaciones = get_publicaciones(grupo_id)
+    publicaciones = get_publicaciones(request, grupo_id)
 
     return render(request, 'admin/admin_publicaciones.html', {
         'publicaciones': publicaciones,

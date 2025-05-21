@@ -11,10 +11,9 @@
       <td>{{ pub.numCuenta }}</td>
       <td>Publicado {{ pub.fecha_creacion|date:"d/m/Y" }} - {{ pub.hora_creacion|time:"H:i:s" }}</td>
       <td>
+        <!--
         <div class="d-flex gap-2">
-          <a href="{% url 'revisar_publicacion' pub.id %}" class="btn btn-info">Revisar</a>
-          <a href="{% url 'eliminar_publicacion' pub.id %}" class="btn btn-danger">🗑 Eliminar</a>
-        </div>
+        </div>-->
       </td>
     </tr>
   {% endfor %}

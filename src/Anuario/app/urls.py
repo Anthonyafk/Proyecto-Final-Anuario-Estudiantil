@@ -15,9 +15,11 @@ urlpatterns = [
     path('grupos/unirse/', views.unirse_grupo, name='unirseGrupo'),
     path('grupos/nuevo/', views.crear_o_editar_grupo, name='crear_grupo'),
     path('grupos/<int:grupo_id>/editar/', views.crear_o_editar_grupo, name='editar_grupo'),
+    path('grupos/<int:grupo_id>/publicar/', views.publicar, name='publicar'),
     path('grupos/<int:grupo_id>/admin/alumnos/', views.ad_alumnos, name='ad_alumnos'),
     path('grupos/<int:grupo_id>/admin/publicaciones/', views.ad_publicaciones, name='ad_publicaciones'),
     path('grupos/<int:grupo_id>/admin/comentarios/', views.ad_comentarios, name='ad_comentarios'),
+    path('grupos/<int:grupo_id>/admin/expulsar/<int:numCuenta>/', views.expulsar_alumno, name='expulsar_alumno'),
     path("accounts/signup/", views.signup, name="signup"),
     path("accounts/", include("django.contrib.auth.urls")),  # new
     #path("", TemplateView.as_view(template_name="home.html"), name="home")  # new
