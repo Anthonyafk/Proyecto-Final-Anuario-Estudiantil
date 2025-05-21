@@ -1,0 +1,24 @@
+{# templates/admin/admin_publicaciones.html #}
+{% extends 'admin/admin_base.html' %}
+
+{% block admin_title %}Administrar Publicaciones{% endblock %}
+{% block header %}Publicaciones{% endblock %}
+
+{% block admin_content %}
+{% if publicaciones %}
+  {% for pub in publicaciones %}
+    <tr>
+      <td>{{ pub.numCuenta }}</td>
+      <td>Publicado {{ pub.fecha_creacion|date:"d/m/Y" }} - {{ pub.hora_creacion|time:"H:i:s" }}</td>
+      <td>
+        <!--
+        <div class="d-flex gap-2">
+        </div>-->
+      </td>
+    </tr>
+  {% endfor %}
+{% else %}
+  <h4 class="py-4 text-center">No hay publicaciones registradas</h4>
+{% endif %}
+{% endblock %}
+

@@ -32,44 +32,68 @@
         <div class="mb-3 position-relative">
           <i class="fas fa-user position-absolute top-50 start-0 translate-middle-y ms-3 text-muted"></i>
           {{ form.numCuenta }}
+          {% if form.numCuenta.errors %}
+            <div class="text-danger small mt-1">{{ form.numCuenta.errors.0 }}</div>
+          {% endif %}
         </div>
 
         <div class="mb-3 position-relative">
           <i class="fas fa-user position-absolute top-50 start-0 translate-middle-y ms-3 text-muted"></i>
           {{ form.nombre }}
+          {% if form.nombre.errors %}
+            <div class="text-danger small mt-1">{{ form.nombre.errors.0 }}</div>
+          {% endif %}
         </div>
 
         <div class="mb-3 position-relative">
           <i class="fas fa-user position-absolute top-50 start-0 translate-middle-y ms-3 text-muted"></i>
           {{ form.primer_apellido }}
+          {% if form.primer_apellido.errors %}
+            <div class="text-danger small mt-1">{{ form.primer_apellido.errors.0 }}</div>
+          {% endif %}
         </div>
 
         <div class="mb-3 position-relative">
           <i class="fas fa-user position-absolute top-50 start-0 translate-middle-y ms-3 text-muted"></i>
           {{ form.segundo_apellido }}
+          {% if form.segundo_apellido.errors %}
+            <div class="text-danger small mt-1">{{ form.segundo_apellido.errors.0 }}</div>
+          {% endif %}
         </div>
 
         <div class="mb-3 position-relative">
           <i class="fas fa-user position-absolute top-50 start-0 translate-middle-y ms-3 text-muted"></i>
           {{ form.nombre_usuario}}
+
+          {% if form.nombre_usuario.errors %}
+            <div class="text-danger small mt-1">{{ form.nombre_usuario.errors.0 }}</div>
+          {% endif %}
         </div>
 
         <div class="mb-3 position-relative">
           <i class="fas fa-envelope position-absolute top-50 start-0 translate-middle-y ms-3 text-muted"></i>
           {{ form.correoE }}
+          {% if form.correoE.errors %}
+            <div class="text-danger small mt-1">{{ form.correoE.errors.0 }}</div>
+          {% endif %}
         </div>
 
         <div class="mb-4 position-relative">
           <i class="fas fa-lock position-absolute top-50 start-0 translate-middle-y ms-3 text-muted"></i>
           {{ form.password1 }}
+          {% if form.password1.errors %}
+            <div class="text-danger small mt-1">{{ form.password1.errors.0 }}</div>
+          {% endif %}
         </div>
 
         <div class="mb-4 position-relative">
           <i class="fas fa-lock position-absolute top-50 start-0 translate-middle-y ms-3 text-muted"></i>
           {{ form.password2 }}
+          {% if form.password2.errors %}
+            <div class="text-danger small mt-1">{{ form.password2.errors.0 }}</div>
+          {% endif %}
         </div>
         
-        <!--{{form}}-->
         <div class="py-3"></div>
         <button type="submit" class="btn btn-success w-100 rounded-pill py-2 fw-bold mb-3">Crear</button>
         <div class="text-center">

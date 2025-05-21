@@ -1,0 +1,43 @@
+{# templates/admin/base_admin.html #}
+{% extends 'common/grupo_base.html' %}
+
+{% block grupo_content %}
+{% load static %}
+{% load widget_tweaks %}
+<head>
+  <title>{% block title  %}{% block admin_title %}Administración{% endblock %}{% endblock %}</title>
+	<script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+</head>
+
+<div class="container py-4 flex-grow-1">
+  <!-- Título del grupo -->
+  <div class="row">
+    <div class="col-4 py-3">
+      <h2>{% block header %}Administración{% endblock %}</h2>
+    </div>
+  <!-- Formulario de búsqueda -->
+  <div class="col">
+  <form method="get" class="my-3">
+    <div class="input-group">
+      {{ form.nombre|add_class:"form-control" | attr:"placeholder:Buscar Estudiante..." }}
+      <button type="submit" class="btn btn-outline-secondary">
+        <i class="fas fa-search"></i>
+      </button>
+    </div>
+  </form>
+  </div>
+  </div>
+
+  <!-- Contenido específico -->
+  <div class="table-responsive">
+    <table class="table">
+      <tbody>
+        {% block admin_content %}
+        <!-- Se sobrescribe en cada vista -->
+        {% endblock %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}
+

@@ -31,11 +31,18 @@
         </form>
         
         <!-- Enlace -->
-        <button class="btn btn-outline-success">Ingresar a un Grupo</button>
+        <a href="{% url 'unirseGrupo' %}" class="btn btn-outline-success">Ingresar a un Grupo</a>
+        {% if user.is_staff %}
+          <a href="{% url 'crear_grupo' %}" class="btn btn-outline-primary">Crear nuevo grupo</a> <!--Boton para crear grupo, solo admin-->
+        {% endif %}
         <!-- Ícono de usuario -->
         <button class="btn btn-outline-secondary rounded-circle d-flex align-items-center justify-content-center" style="width: 36px; height: 36px;">
-          <a class="text-dark" href={% url 'perfil' user.numCuenta%}>
-            <i class="bi bi-person"></i>
+          <a class="text-dark" href="{% url 'perfil' user.numCuenta %}">   <!-- Ícono de usuario o foto de perfil -->
+            {% if user.tener.idPerfil.foto_perfil %}
+              <img src="{{ user.tener.idPerfil.foto_perfil.url }}" alt="Foto de perfil" class="rounded-circle" style="width: 32px; height: 32px; object-fit: cover;">
+            {% else %}
+              <i class="bi bi-person"></i>
+            {% endif %}
           </a>
         </button>
       </div>
@@ -66,9 +73,33 @@
     </div>
   </div>
 </footer>
+<!--<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>-->
     <!-- Bootstrap Icons CDN -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js" integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.5/dist/js/bootstrap.min.js" integrity="sha384-VQqxDN0EQCkWoxt/0vsQvZswzTHUVOImccYmSyhJTp7kGtPed0Qcx8rK9h9YEgx+" crossorigin="anonymous"></script>
+
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+    function confirmExpulsion(redirectUrl) {
+        Swal.fire({
+            title: '¿Estás seguro?',
+            text: "Esta acción expulsará al usuario.",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#d33',
+            cancelButtonColor: '#6c757d',
+            confirmButtonText: 'Sí, expulsar',
+            cancelButtonText: 'Cancelar'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                window.location.href = redirectUrl;
+            }
+        });
+    }
+</script>
+
+{% load sweetify %}
+{% sweetify %}
 </body>
 </html>

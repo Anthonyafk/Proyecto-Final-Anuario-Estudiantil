@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+
+{% block content %}
+<!-- Navegación del grupo -->
+<div class="container d-flex align-items-center py-3 px-4 border-bottom bg-white">
+  <!-- Botón volver con JavaScript -->
+  <!--<button onclick="window.history.back()" class="btn btn-link text-dark me-3 p-0 border-0 bg-transparent" title="Volver">
+    <i class="fas fa-arrow-left"></i>
+  </button>-->
+
+  <a href="{% url 'home' %}" class="btn btn-link text-dark me-3 p-0 border-0 bg-transparent" title="Volver">
+    <i class="fas fa-arrow-left"></i>
+  </a>
+
+  <!-- Enlaces -->
+  <nav class="d-flex gap-3">
+    <a href="{% url 'detalle_grupo' grupo_id=grupo.codigo %}" class="text-dark text-decoration-none">Principal</a>
+    <a href="{% url 'nominaciones' grupo_id=grupo.codigo %}" class="text-dark text-decoration-none">Nominaciones</a>
+    {% if user.is_superuser %}
+    <!-- Dropdown Administración -->
+    <div class="dropdown">
+      <a class="dropdown-toggle text-dark text-decoration-none" href="#" role="button" id="adminDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+        Administración
+      </a>
+      <ul class="dropdown-menu" aria-labelledby="adminDropdown">
+        <li><a class="dropdown-item" href="{% url 'ad_alumnos' grupo_id=grupo.codigo %}">Alumnos</a></li>
+        <li><a class="dropdown-item" href="{% url 'ad_publicaciones' grupo_id=grupo.codigo %}">Publicaciones</a></li>
+        <li><a class="dropdown-item" href="{% url 'ad_comentarios' grupo_id=grupo.codigo %}">Comentarios</a></li>
+      </ul>
+    </div>
+    {% else %}
+      <a href="{% url 'integrantes' grupo_id=grupo.codigo %}" class="text-dark text-decoration-none">Integrantes</a>
+    {% endif %}
+  </nav>
+</div>
+
+<!-- Contenido de cada página -->
+<div class="container mt-4 flex-grow-1">
+  {% block grupo_content %}
+  {% endblock %}
+</div>
+{% endblock %}
+

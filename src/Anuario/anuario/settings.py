@@ -43,6 +43,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'crispy_forms',
     'widget_tweaks',
+    'sweetify',
 ]
 
 AUTH_USER_MODEL = 'app.Usuario'
@@ -94,7 +95,7 @@ DATABASES = {
     'ENGINE': 'django.db.backends.postgresql',
     'NAME': 'anuario',
 	'USER': 'postgres',
-	'PASSWORD': 'Kiwi2gatos',
+	'PASSWORD': 'Slayer_45!',
 	'HOST': 'localhost',
 	'PORT': '5432',
     }
@@ -137,7 +138,7 @@ USE_TZ = True
 
 STATIC_URL = 'static/'
 STATICFILES_DIRS = [
-    os.path.join(BASE_DIR, 'static')
+    os.path.join(BASE_DIR, 'app', 'static')
 ]
 
 MEDIA_URL = 'media/'
@@ -151,3 +152,5 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 LOGIN_REDIRECT_URL = "home"  # new
 LOGOUT_REDIRECT_URL = 'login'
+
+SWEETIFY_SWEETALERT_LIBRARY = 'sweetalert2'
