@@ -30,6 +30,10 @@
   <!-- Botones de acción -->
   <div class="d-flex align-items-center gap-2">
     {% if user.is_superuser %}
+    <a class="btn btn-outline-dark" href="{% url 'editar_perfil' usuario_id=integrante.numCuenta %}">
+        <i class="fas fa-pencil me-1"></i> Editar
+      </a>
+      
       <button class="btn btn-danger" onclick="confirmExpulsion('{% url 'expulsar_alumno' grupo_id=grupo.codigo numCuenta=integrante.numCuenta %}')">
         <i class="fas fa-trash-alt me-1"></i> Expulsar
       </button>

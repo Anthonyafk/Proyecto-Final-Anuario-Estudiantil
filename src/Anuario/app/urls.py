@@ -7,7 +7,7 @@ urlpatterns = [
     #path("551123012/", views.index, name="index"),
     path("perfil/<int:usuario_id>", views.verPerfil, name="perfil"),
     path("perfil/comentario/<int:idPerfil>", views.comentarioPerfil, name="add_comentario"),
-    path("perfil/editar/", views.editar_perfil, name="editar_perfil"),
+    path("perfil/editar/<int:usuario_id>", views.editar_perfil, name="editar_perfil"),
     # path("grupo/info/", views.detalle_grupo, name="grupo_info"),
     path('grupos/<int:grupo_id>/',views.detalle_grupo,name='detalle_grupo'), #ruta anterior pero dinamica
     path("grupos/<int:grupo_id>/nominaciones/", views.nominaciones, name="nominaciones"),
@@ -27,3 +27,14 @@ urlpatterns = [
     #path("", TemplateView.as_view(template_name="home.html"), name="home")  # new
     path("",views.home, name="home")
 ]
+
+'''
+accounts/login/ [name='login']
+accounts/logout/ [name='logout']
+accounts/password_change/ [name='password_change']
+accounts/password_change/done/ [name='password_change_done']
+accounts/password_reset/ [name='password_reset']
+accounts/password_reset/done/ [name='password_reset_done']
+accounts/reset/<uidb64>/<token>/ [name='password_reset_confirm']
+accounts/reset/done/ [name='password_reset_complete']
+'''

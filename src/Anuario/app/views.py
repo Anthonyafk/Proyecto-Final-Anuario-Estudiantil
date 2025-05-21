@@ -119,13 +119,11 @@ def verNominacion(request, idNominacion):
                     inscritos = inscritos.filter(numCuenta__nombre__icontains = nombre) | inscritos.filter(numCuenta__primer_apellido__icontains = nombre) | inscritos.filter(numCuenta__segundo_apellido__icontains = nombre)
             if(not nombreCompleto):
                 dato = 'Busqueda vacia.'
-        
     
     return render(request, "nomination/nomination.html", {'nominacion':nominacion, 'inscritos':inscritos, 'desabilitarPostulacion':desabilitarPostulacion, 'formBusqueda':formBusqueda, 'dato':dato, 'desabilitarVotacion':desabilitarVotacion, 'marcos':marcos})
 
 #Funcion para acceder al perfil del usuario
 def verPerfil(request, usuario_id):
-    
     #Obtiene el Usuario  según el parámetro usuario_id
     usuario_obj = Usuario.objects.get(numCuenta=usuario_id)
     try:
@@ -150,13 +148,13 @@ def verPerfil(request, usuario_id):
     return render(request, 'perfil/perfil.html', datos)
 
 # Función para poder editar perfil
-def editar_perfil(request):
+def editar_perfil(request, usuario_id):
+    usuario = Usuario.objects.get(numCuenta=usuario_id)
     # Obtener el perfil del usuario actual
-    perfil = request.user.tener.idPerfil
-    
+    perfil = usuario.tener.idPerfil
     # Obtiene todos los marcos que ha ganado el usuario
     marcos = Ganar.objects.filter(numCuenta = request.user)
-    
+
     if request.method == 'POST':
         form = PerfilForm(request.POST, request.FILES, instance=perfil)
         if form.is_valid():
@@ -169,11 +167,21 @@ def editar_perfil(request):
                 marcofoto = MarcoFoto(idPerfil=perfil, marco_foto=marco) 
                 marcofoto.save()
             form.save()
-            return redirect('perfil', usuario_id=request.user.numCuenta)  # Redirige al perfil después de editar
+            sweetify.success(
+                request,
+                'Usuario editado',
+                text='Los datos se actualizaron correctamente.',
+                persistent='OK'
+            )
+            return redirect('perfil', usuario_id=usuario_id)  # Redirige al perfil después de editar
     else:
         form = PerfilForm(instance=perfil)
-    
-    return render(request, 'perfil/editar_perfil.html', {'form': form, 'marcos': marcos})
+
+    return render(request, 'perfil/editar_perfil.html', {
+        'form': form,
+        'marcos': marcos,
+        'usuario' : usuario
+    })
 
 #Función para añadir comentarios
 def comentarioPerfil(request, idPerfil):
