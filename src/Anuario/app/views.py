@@ -318,6 +318,7 @@ def publicar(request, grupo_id):
 
             publicacion = Publicacion.objects.create(
                 numCuenta=request.user,
+                codigo=grupo,
                 fecha_creacion=fecha_creacion,
                 hora_creacion=now.time(),
                 descripcion=data['descripcion'],
