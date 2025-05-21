@@ -267,7 +267,19 @@ def integrantes(request, grupo_id):
     })
 
 def comentarios(request, grupo_id, publicacion_id):
-    return redirect('detalle_grupo', grupo_id=grupo_id)
+    grupo = Grupo.objects.get(codigo=grupo_id)
+    publicacion = Publicacion.objects.get(idPublicacion=publicacion_id)
+    poseer = Poseer.objects.filter(idPublicacion=publicacion)
+    comentarios = Comentario.objects.filter(
+        idComentario__in=poseer.values_list('idComentario', flat=True)
+    ).order_by('-fecha_creacion', '-hora_creacion')
+
+    return render(request, 'grupos/comentarios.html', {
+        'grupo' : grupo,
+        'publicacion': publicacion,
+        'comentarios': comentarios,
+        'grupo_id': grupo_id,
+    })
 
 def comentar(request, grupo_id, publicacion_id):
     publicacion = Publicacion.objects.get(idPublicacion=publicacion_id)
