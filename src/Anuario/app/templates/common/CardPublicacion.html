@@ -15,7 +15,7 @@
             {% endif %}
             <strong>{{ publicacion.numCuenta.nombre_usuario }}</strong>
         </div>
-            <small class="text-muted"> {{ publicacion.fecha_creacion }} {{ publicacion.hora_creacion|time:"H:i" }}</small>
+            <small class="text-muted"> {{ publicacion.fecha_creacion }} - {{ publicacion.hora_creacion|time:"H:i" }}</small>
         </div>
 
         <!-- Descripción -->
@@ -40,9 +40,30 @@
         {% endif %}
 
         <!-- Comentarios (placeholder) -->
+        <!--
             <div class="bg-light rounded-pill px-3 py-2 d-flex justify-content-between align-items-center">
                 <span class="text-muted">Dejar un comentario</span>
                 <i class="fas fa-chevron-right text-muted"></i>
+            </div>
+        -->
+            <form method="POST" action="{% url 'comentar' grupo_id=publicacion.codigo.codigo publicacion_id=publicacion.idPublicacion %}" class="mb-3">
+                {% csrf_token %}
+                <div class="input-group">
+                    {{ form.comentario }}
+                    <button type="submit" class="btn btn-outline-secondary rounded-pill ms-2">
+                        <i class="fas fa-chevron-right"></i>
+                    </button>
+                </div>
+                {% if form.comentario.errors %}
+                    <div class="text-danger small mt-1">{{ form.comentario.errors.0 }}</div>
+                {% endif %}
+            </form>
+
+            <div class="text-end">
+                <a href="{% url 'comentarios' grupo_id=publicacion.codigo.codigo publicacion_id=publicacion.idPublicacion %}" class="text-decoration-none text-muted small">
+                    Ver todos los comentarios
+                    <i class="fas fa-comments ms-1"></i>
+                </a>
             </div>
         </div>
     </div>

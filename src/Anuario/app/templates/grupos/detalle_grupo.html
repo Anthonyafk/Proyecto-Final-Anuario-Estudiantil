@@ -1,4 +1,5 @@
 {% extends 'common/grupo_base.html' %}
+{% load custom_tags %}
 <!--Muestra en la parte del enlace una pequeña historia para que el usuario
 sepa en que vista se encuentra-->
 {% block title %}Info Grupos{% endblock %}
@@ -40,7 +41,9 @@ sepa en que vista se encuentra-->
         {% if publicaciones %}
             {% for publicacion in publicaciones %}
                 <div class="container">
-                {% include 'common/CardPublicacion.html' with publicacion=publicacion %}
+                    {% with form=forms|get_item:publicacion.idPublicacion %}
+                        {% include 'common/CardPublicacion.html' with publicacion=publicacion form=form %}
+                    {% endwith %}
                 </div>
             {% endfor %}
         {% else %}

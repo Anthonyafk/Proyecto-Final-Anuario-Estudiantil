@@ -5,17 +5,19 @@
 {% block header %}Comentarios{% endblock %}
 
 {% block admin_content %}
+  {%if comentarios%}
   {% for com in comentarios%}
     <tr>
       <td>{{ com.numCuenta }}</td>
       <td>Realizado {{ com.fecha_creacion|date:"d/m/Y" }} - {{ com.hora_creacion|time:"H:i:s" }}</td>
       <td>
         <div class="d-flex gap-2">
-          <a href="{% url 'revisar_publicacion' pub.id %}" class="btn btn-info">Revisar</a>
-          <a href="{% url 'eliminar_publicacion' pub.id %}" class="btn btn-danger">🗑 Eliminar</a>
         </div>
       </td>
     </tr>
   {% endfor %}
+  {% else %}
+    <h4 class="py-4 text-center">No hay comentarios registrados</h4>
+  {% endif %}
 {% endblock %}
 

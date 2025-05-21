@@ -226,9 +226,14 @@ def detalle_grupo(request, grupo_id):
         if not pertenece:
             return alerta_grupo(request)
 
+    forms = {
+        pub.idPublicacion : DejarComentario() for pub in publicaciones
+    }
+
     return render(request, 'grupos/detalle_grupo.html', {
         'grupo': grupo,
         'publicaciones' : publicaciones,
+        'forms' : forms
     })
 
 def revisar_integrantes(request, grupo_id):
@@ -260,6 +265,34 @@ def integrantes(request, grupo_id):
         'integrantes': integrantes_qs,
         'marcos':marcos
     })
+
+def comentarios(request, grupo_id, publicacion_id):
+    return redirect('detalle_grupo', grupo_id=grupo_id)
+
+def comentar(request, grupo_id, publicacion_id):
+    publicacion = Publicacion.objects.get(idPublicacion=publicacion_id)
+    perfil_tener = Tener.objects.get(numCuenta=request.user)
+    if request.method=="POST":
+        form = DejarComentario(request.POST)
+        if form.is_valid():
+            contenido = form.cleaned_data['comentario']
+            fecha_creacion = date.today()
+            now = datetime.now()
+
+            if contenido:
+                comentario = Comentario.objects.create(
+                    idPerfil=perfil_tener.idPerfil,
+                    numCuenta=request.user,
+                    contenido=contenido,
+                    fecha_creacion=fecha_creacion,
+                    hora_creacion=now
+                )
+                Poseer.objects.create(
+                    idComentario=comentario,
+                    idPublicacion=publicacion
+                )
+
+    return redirect('detalle_grupo', grupo_id=grupo_id)
 
 def publicar(request, grupo_id):
     grupo = Grupo.objects.get(codigo=grupo_id)
@@ -315,16 +348,8 @@ def ad_alumnos(request,grupo_id):
     })
 
 def get_publicaciones(request, grupo_id):
-    publicaciones = []
     publicaciones = Publicacion.objects.filter(
-        numCuenta__in=Gestionar.objects.filter(
-            codigo__codigo=grupo_id
-        ).values_list('numCuenta', flat=True)
-    ).order_by('-fecha_creacion', '-hora_creacion')
-    publicaciones |= Publicacion.objects.filter(
-        numCuenta__in=Pertenecer.objects.filter(
-            codigo__codigo=grupo_id
-        ).values_list('numCuenta', flat=True)
+        codigo__codigo=grupo_id
     ).order_by('-fecha_creacion', '-hora_creacion')
     return publicaciones
 
@@ -340,12 +365,12 @@ def ad_publicaciones(request, grupo_id):
 
 def ad_comentarios(request, grupo_id):
     # Obtener publicaciones del grupo
-    publicaciones = get_publicaciones(grupo_id)
+    publicaciones = get_publicaciones(request,grupo_id)
     if publicaciones:
         publicaciones_ids = publicaciones.values_list('idPublicacion', flat=True)
         # Obtener comentarios relacionados usando la tabla intermedia Poseer
         comentarios = Comentario.objects.filter(
-            idcomentario__in=Poseer.objects.filter(
+            idComentario__in=Poseer.objects.filter(
                 idPublicacion__in=publicaciones_ids
             ).values_list('idComentario', flat=True)
         ).order_by('-fecha_creacion', '-hora_creacion')  # Si tu modelo Comentario tiene estos campos

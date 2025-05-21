@@ -135,6 +135,7 @@ class Comentario(models.Model):
 class Publicacion(models.Model):
     idPublicacion = models.AutoField(primary_key=True)
     numCuenta = models.ForeignKey(Usuario, on_delete=models.CASCADE)
+    codigo = models.ForeignKey(Grupo, on_delete=models.CASCADE)
     fecha_creacion = models.DateField()
     hora_creacion = models.TimeField()
     descripcion = models.TextField(blank=True)
@@ -254,7 +255,6 @@ class Postular(models.Model):
 
     class Meta:
         unique_together = (('numCuenta', 'idNominacion'),)
-
 
 class MarcoFoto(models.Model):
     idPerfil = models.ForeignKey(Perfil, on_delete=models.CASCADE)

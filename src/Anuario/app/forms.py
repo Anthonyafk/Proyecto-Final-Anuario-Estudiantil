@@ -141,11 +141,11 @@ class GrupoForm(forms.Form):
 class DejarComentario(forms.Form):
     #Input para texto tiene label, texto de ayuda, si es o no requerido y al final el parametro para insertar bootstrap
     comentario = forms.CharField(
-        label="Comentario:", 
-        help_text="Escribe tu comentario...", 
+        label="Comentario:",
+        help_text="Escribe tu comentario...",
         required=False, widget=forms.TextInput(attrs={
-            'class':'form-control', 
-            'placeholder': 'Escribe tu comentario...'
+            'class':'form-control rounded-pill bg-light',
+            'placeholder': 'Dejar un comentario'
         }))
 
 class PublicacionForm(forms.Form):
