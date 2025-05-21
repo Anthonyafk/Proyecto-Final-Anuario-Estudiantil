@@ -27,6 +27,10 @@ sepa en que vista se encuentra-->
 <div class="card-body position-relative pt-5">  
   <!-- Centrar foto de perfil -->
   <div class="position-absolute top-0 start-50 translate-middle" style="top: -75px;">
+    {% if marco.marco_foto %}
+      <img src="{{marco.marco_foto.marco.url}}" alt="Marco" style="position:absolute; width:170px; inset-inline-start: -10px;
+inset-block-start: -10px;">
+    {% endif %}
     <div class="border border-4 border-white rounded-circle" style="width: 150px; height: 150px; overflow: hidden;">
       <!--Si tiene foto la muestra, en caso contrario muestra ícono -->
       {% if perfil.foto_perfil %}
@@ -50,7 +54,6 @@ sepa en que vista se encuentra-->
       <a href="{% url 'editar_perfil' %}" class="btn btn-primary">Editar Perfil</a>
     {% endif %}
     
-    {{marco.marco_foto}}
   </div>
 </div>
       

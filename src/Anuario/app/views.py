@@ -3,7 +3,7 @@ import string
 import sweetify
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
-from .models import Usuario, Grupo, Comentario, Publicacion, Nominacion, Perfil, Tener, Pertenecer, Postular, Votar, MarcoFoto, Ganar, Comentario, Gestionar, Poseer # .... etc.
+from .models import Usuario, Grupo, Comentario, Publicacion, Nominacion, Perfil, Tener, Pertenecer, Postular, Votar, MarcoFoto, Ganar, Comentario, Gestionar, Poseer, Marco # .... etc.
 from .forms import UsuarioRegistroForm, UsuarioBusquedaNominacion, PerfilForm, DejarComentario, GroupJoinForm, GrupoForm, PublicacionForm
 from django.contrib.auth import authenticate, login
 from django.db import IntegrityError
@@ -162,10 +162,11 @@ def editar_perfil(request):
         if form.is_valid():
             marcoElegido = request.POST.get('marco_foto')
             if marcoElegido:
+                marco = Marco.objects.get(idMarco = marcoElegido)
                 marcoUnoAUno = MarcoFoto.objects.filter(idPerfil=perfil)
                 if marcoUnoAUno.exists():
                     marcoUnoAUno.delete()
-                marcofoto = MarcoFoto(idPerfil=perfil, marco_foto=marcoElegido) 
+                marcofoto = MarcoFoto(idPerfil=perfil, marco_foto=marco) 
                 marcofoto.save()
             form.save()
             return redirect('perfil', usuario_id=request.user.numCuenta)  # Redirige al perfil después de editar
