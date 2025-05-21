@@ -16,8 +16,6 @@
   <nav class="d-flex gap-3">
     <a href="{% url 'detalle_grupo' grupo_id=grupo.codigo %}" class="text-dark text-decoration-none">Principal</a>
     <a href="{% url 'nominaciones' grupo_id=grupo.codigo %}" class="text-dark text-decoration-none">Nominaciones</a>
-    <a href="{% url 'integrantes' grupo_id=grupo.codigo %}" class="text-dark text-decoration-none">Integrantes</a>
-
     {% if user.is_superuser %}
     <!-- Dropdown Administración -->
     <div class="dropdown">
@@ -30,6 +28,8 @@
         <li><a class="dropdown-item" href="{% url 'ad_comentarios' grupo_id=grupo.codigo %}">Comentarios</a></li>
       </ul>
     </div>
+    {% else %}
+      <a href="{% url 'integrantes' grupo_id=grupo.codigo %}" class="text-dark text-decoration-none">Integrantes</a>
     {% endif %}
   </nav>
 </div>

@@ -110,7 +110,6 @@ class GroupJoinForm(forms.Form):
             'placeholder': 'Ingresa el código de acceso'
         })
     )
-    
 
 # Formulario para grupo
 class GrupoForm(forms.Form):
@@ -139,8 +138,6 @@ class GrupoForm(forms.Form):
         })
     )
 
-    
-
 class DejarComentario(forms.Form):
     #Input para texto tiene label, texto de ayuda, si es o no requerido y al final el parametro para insertar bootstrap
     comentario = forms.CharField(
@@ -150,3 +147,20 @@ class DejarComentario(forms.Form):
             'class':'form-control', 
             'placeholder': 'Escribe tu comentario...'
         }))
+
+class PublicacionForm(forms.Form):
+    descripcion = forms.CharField(
+        label="descripcion",
+        required=True,
+        widget=forms.Textarea(attrs={
+            'class': 'form-control bg-light',
+            'placeholder': 'Escribe algo...'
+        })
+    )
+    imagen = forms.ImageField(
+        required=False,
+        label="Imagen de publicacion",
+        widget=forms.ClearableFileInput(attrs={
+            'class': 'form-control rounded-pill bg-light'
+        })
+    )

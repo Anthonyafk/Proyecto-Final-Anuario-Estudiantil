@@ -8,8 +8,8 @@
 {% block header %}Alumnos{% endblock %}
 
 {% block admin_content %}
-  {% if alumnos %}
-    {% for alumno in alumnos %}
+  {% if integrantes %}
+    {% for alumno in integrantes %}
       {% include 'common/CardIntegrante.html' with integrante=alumno%}
     {% endfor %}
 

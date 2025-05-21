@@ -1,5 +1,5 @@
 {% load static %}
-<div class="card" style="height: 12rem; width: 20rem; border-radius: 10px; overflow: hidden;">
+<div class="card" style="height: 12rem; width: 18rem; border-radius: 10px; overflow: hidden;">
   <a href="{% url 'detalle_grupo' grupo.codigo %}" style="text-decoration: none;">
   {% if grupo.foto_portada %}
     <img src="{{ grupo.foto_portada.url }}" class="card-img-top" alt="Imagen de Grupo" style="height: 120px; object-fit: cover;">  

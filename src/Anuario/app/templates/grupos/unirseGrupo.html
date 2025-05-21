@@ -2,23 +2,6 @@
 {% load widget_tweaks %}
 {% block content %}
 <div class="container container-fluid px-4 flex-grow-1">
-    <!-- Navegación -->
-    <div class="d-flex align-items-center py-3">
-        <button class="btn btn-link text-dark me-3 p-0 border-0 bg-transparent" onclick="window.history.back();">
-            <i class="fas fa-arrow-left"></i>
-        </button>
-        <nav class="d-flex gap-3">
-            <a href="{% url 'home' %}" class="text-dark text-decoration-none">Principal</a>
-            {% if grupo %}
-                <a href="{% url 'nominaciones' grupo_id=grupo.codigo %}" class="text-dark text-decoration-none">Nominaciones</a>
-                <a href="{% url 'integrantes' grupo_id=grupo.codigo %}" class="text-dark text-decoration-none">Integrantes</a>
-            {% else %}
-                <span class="text-muted text-decoration-none">Nominaciones</span>
-                <span class="text-muted text-decoration-none">Integrantes</span>
-            {% endif %}
-            <a href="#" class="text-dark text-decoration-none">Administración</a>
-        </nav>
-    </div>
 
     <!-- Mensajes de Django -->
     {% if messages %}
