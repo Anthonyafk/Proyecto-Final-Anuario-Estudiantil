@@ -9,7 +9,7 @@
 		<!-- Encabezado con foto y username -->
 		<div class="d-flex justify-content-between align-items-center mb-2">
         <div class="d-flex align-items-center">
-		        <!-- Imagen de perfil en círculo -->
+		        <!-- Imagen de perfil -->
             {% if publicacion.numCuenta.tener.idPerfil.foto_perfil %}
 					      <img src="{{ publicacion.numCuenta.tener.idPerfil.foto_perfil.url }}" alt="Foto perfil"
               	        class="rounded-circle me-2" width="40" height="40" style="object-fit: cover;">
@@ -43,11 +43,7 @@
             {% if comentarios %}
                 <ul class="list-group list-group-flush">
                     {% for comentario in comentarios %}
-                        <li class="list-group-item">
-                            <strong>{{ comentario.numCuenta.nombre_usuario }}:</strong>
-                            <p>{{ comentario.contenido }}</p>
-                            <small class="text-muted">{{ comentario.fecha_creacion }} {{ comentario.hora_creacion|time:"H:i" }}</small>
-                        </li>
+                        {% include 'common/CardComentarios.html' with comentario=comentario %}
                     {% endfor %}
                 </ul>
             {% else %}

@@ -1,23 +1,8 @@
-{% extends 'base.html' %}
+{% extends 'common/grupo_base.html' %}
 {% load static %}
 
-{% block content %}
+{% block grupo_content %}
 <div class="container py-4 flex-grow-1">
-  <!-- Navegación -->
-  <div class="d-flex align-items-center py-3">
-      <button class="btn btn-link text-dark me-3 p-0 border-0 bg-transparent" onclick="window.history.back();">
-          <i class="fas fa-arrow-left"></i>
-      </button>
-      {% if grupo %}
-      <nav class="d-flex gap-3">
-          <a href="{% url 'detalle_grupo' grupo_id=grupo.codigo  %}" class="text-dark text-decoration-none">Principal</a>
-          <a href="{% url 'nominaciones' grupo_id=grupo.codigo %}" class="text-dark text-decoration-none">Nominaciones</a>
-          <a href="{% url 'integrantes' grupo_id=grupo.codigo %}" class="text-dark text-decoration-none">Integrantes</a>
-          <a href="#" class="text-dark text-decoration-none">Administración</a>
-      </nav>
-      {% endif %}
-  </div>
-
   <h2 class="mb-4">
     {% if grupo %}Editar Grupo{% else %}Crear Grupo{% endif %}
   </h2>

@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% load custom_tags %}
 {% block content %}
 <div class="container flex-grow-1">
 	<div class="row py-4">
@@ -21,7 +22,9 @@
 	<div class="container">
 	    <p style="color: crimson;">{{dato}}</p>
 			{%for inscrito in inscritos %}
-				{% include 'common/CardPostulados.html' %}
+				{% with numCuenta=inscrito.numCuenta.numCuenta%}
+					{% include 'common/CardPostulados.html' %}
+        {% endwith %}
 			{% endfor %}
 		</div>
 	</div>

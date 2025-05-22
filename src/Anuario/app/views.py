@@ -4,7 +4,7 @@ import sweetify
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
 from .models import Usuario, Grupo, Comentario, Publicacion, Nominacion, Perfil, Tener, Pertenecer, Postular, Votar, MarcoFoto, Ganar, Comentario, Gestionar, Poseer, Marco # .... etc.
-from .forms import UsuarioRegistroForm, UsuarioBusquedaNominacion, PerfilForm, DejarComentario, GroupJoinForm, GrupoForm, PublicacionForm
+from .forms import UsuarioRegistroForm, UsuarioBusquedaNominacion, PerfilForm, DejarComentario, GroupJoinForm, GrupoForm, PublicacionForm, BusquedaGenericaForm, EditarPublicacionForm
 from django.contrib.auth import authenticate, login
 from django.db import IntegrityError
 from django.contrib.auth.decorators import login_required
@@ -78,28 +78,28 @@ def verNominacion(request, idNominacion):
     #No se debe habilitar la opción de postularse si el usuario ya esta inscrito 
     numCuenta = request.user
     formBusqueda = UsuarioBusquedaNominacion()
-    
+
     desabilitarPostulacion = ""
     desabilitarVotacion = ""
     dato = ""
-    
+    #inscrito = False
+
     marcos = MarcoFoto.objects.all()
-    
+
     nominacion = Nominacion.objects.get(pk = idNominacion)
     inscritos = Postular.objects.filter(idNominacion = idNominacion)
-    
+
     usuarioInscrito = inscritos.filter(numCuenta = numCuenta)
-    
+
     if(usuarioInscrito.exists()):
         desabilitarPostulacion = "style= display:none;"
-        inscritos = inscritos.exclude(numCuenta = numCuenta)
-    
+
     votoAntes = Votar.objects.filter(idNominacion = idNominacion)
     votoAntes = votoAntes.filter(numCuenta = numCuenta.numCuenta)
-    
+
     if(votoAntes.exists()):
         desabilitarVotacion = "style=display:none;"
-    
+
     if(request.method == "POST"):
         if 'Postular' in request.POST:
             postular = Postular(numCuenta = numCuenta, idNominacion = nominacion)
@@ -119,8 +119,16 @@ def verNominacion(request, idNominacion):
                     inscritos = inscritos.filter(numCuenta__nombre__icontains = nombre) | inscritos.filter(numCuenta__primer_apellido__icontains = nombre) | inscritos.filter(numCuenta__segundo_apellido__icontains = nombre)
             if(not nombreCompleto):
                 dato = 'Busqueda vacia.'
-    
-    return render(request, "nomination/nomination.html", {'nominacion':nominacion, 'inscritos':inscritos, 'desabilitarPostulacion':desabilitarPostulacion, 'formBusqueda':formBusqueda, 'dato':dato, 'desabilitarVotacion':desabilitarVotacion, 'marcos':marcos})
+    print(inscritos)
+    return render(request, "nomination/nomination.html", {
+        'nominacion':nominacion,
+        'inscritos':inscritos,
+        'desabilitarPostulacion':desabilitarPostulacion,
+        'formBusqueda':formBusqueda,
+        'dato':dato,
+        'desabilitarVotacion':desabilitarVotacion,
+        'marcos':marcos,
+    })
 
 #Funcion para acceder al perfil del usuario
 def verPerfil(request, usuario_id):
@@ -314,6 +322,44 @@ def comentar(request, grupo_id, publicacion_id):
 
     return redirect('detalle_grupo', grupo_id=grupo_id)
 
+def editar_comentario(request, grupo_id, comentario_id):
+    grupo = Grupo.objects.get(codigo=grupo_id)
+    comentario = Comentario.objects.get(idComentario=comentario_id)
+
+    form = DejarComentario()
+    if request.method=="POST":
+        form = DejarComentario(request.POST)
+        if form.is_valid():
+            contenido = form.cleaned_data['comentario']
+            fecha_creacion = date.today()
+            now = datetime.now()
+
+            if contenido:
+                comentario.contenido = contenido
+                comentario.fecha_creacion = fecha_creacion
+                comentario.hora_creacion = now
+            comentario.save()
+            sweetify.success(
+                request,
+                'Comentario editado',
+                text='Los datos se actualizaron correctamente.',
+                persistent='OK'
+            )
+            return redirect('detalle_grupo', grupo_id=grupo_id)
+
+    return render(request, "grupos/editar_comentario.html",{
+        'grupo' : grupo,
+        'comentario' : comentario,
+        'form' : form
+    })
+
+def eliminar_comentario(request, grupo_id, comentario_id):
+    comentario = get_object_or_404(Comentario, idComentario=comentario_id)
+    comentario.delete()
+
+    sweetify.success(request, 'Comentario eliminado', text='El comentario ha sido eliminado', persistent='OK')
+    return redirect('ad_comentarios', grupo_id=grupo_id)
+
 def publicar(request, grupo_id):
     grupo = Grupo.objects.get(codigo=grupo_id)
 
@@ -323,16 +369,6 @@ def publicar(request, grupo_id):
             data = form.cleaned_data
             fecha_creacion = date.today()
             now = datetime.now()
-
-            publicacion = Publicacion.objects.create(
-                numCuenta=request.user,
-                codigo=grupo,
-                fecha_creacion=fecha_creacion,
-                hora_creacion=now.time(),
-                descripcion=data['descripcion'],
-                imagen=data.get('imagen'),
-                video_url=None
-            )
 
             sweetify.success(
                 request,
@@ -349,6 +385,47 @@ def publicar(request, grupo_id):
         'grupo': grupo,
         'form': form
     })
+
+def editar_publicacion(request, grupo_id, publicacion_id):
+    grupo = Grupo.objects.get(codigo=grupo_id)
+    publicacion = Publicacion.objects.get(idPublicacion=publicacion_id)
+
+    form = EditarPublicacionForm()
+    if request.method=="POST":
+        form = EditarPublicacionForm(request.POST, request.FILES)
+        if form.is_valid():
+            descripcion = form.cleaned_data['descripcion']
+            fecha_creacion = date.today()
+            now = datetime.now()
+            imagen = form.cleaned_data['imagen']
+
+            if descripcion:
+                publicacion.descripcion = descripcion
+                publicacion.fecha_creacion = fecha_creacion
+                publicacion.hora_creacion = now
+            if imagen:
+                publicacion.image = imagen
+            publicacion.save()
+            sweetify.success(
+                request,
+                'Publicacion editada',
+                text='Los datos se actualizaron correctamente.',
+                persistent='OK'
+            )
+            return redirect('detalle_grupo', grupo_id=grupo_id)
+
+    return render(request, "grupos/editar_publicacion.html",{
+        'grupo' : grupo,
+        'publicacion' : publicacion,
+        'form' : form
+    })
+
+def eliminar_publicacion(request, grupo_id, publicacion_id):
+    publicacion = get_object_or_404(Publicacion, idPublicacion=publicacion_id)
+    publicacion.delete()
+
+    sweetify.success(request, 'Publicacion eliminada', text='La publicacion ha sido eliminada', persistent='OK')
+    return redirect('ad_publicaciones', grupo_id=grupo_id)
 
 def expulsar_alumno(request, grupo_id, numCuenta):
     pertenencia = get_object_or_404(Pertenecer, codigo__codigo=grupo_id, numCuenta__numCuenta=numCuenta)
@@ -374,34 +451,64 @@ def get_publicaciones(request, grupo_id):
     ).order_by('-fecha_creacion', '-hora_creacion')
     return publicaciones
 
+@staff_member_required
 def ad_publicaciones(request, grupo_id):
-    # Subconsulta: obtener publicaciones de alumnos que pertenecen al grupo
     grupo = Grupo.objects.get(codigo=grupo_id)
-    publicaciones = get_publicaciones(request, grupo_id)
+    publicaciones = get_publicaciones(request, grupo_id) # Publicaciones del grupo
+    form = BusquedaGenericaForm(request.GET or None)
+    if form.is_valid():
+        usuario = form.cleaned_data.get('nombre_usuario')
+        numCuenta = form.cleaned_data.get('numCuenta')
+        fecha = form.cleaned_data.get('fecha')
+
+        if usuario:
+            publicaciones = publicaciones.filter(numCuenta__nombre_usuario__icontains=usuario)
+        if numCuenta:
+            publicaciones = publicaciones.filter(numCuenta__numCuenta__icontains=numCuenta)
+        if fecha:
+            publicaciones = publicaciones.filter(fecha_creacion=fecha)
 
     return render(request, 'admin/admin_publicaciones.html', {
         'publicaciones': publicaciones,
-        'grupo' : grupo
+        'grupo' : grupo,
+        'is_generic' : True,
+        'form' : form
     })
 
+@staff_member_required
 def ad_comentarios(request, grupo_id):
     # Obtener publicaciones del grupo
     publicaciones = get_publicaciones(request,grupo_id)
     if publicaciones:
         publicaciones_ids = publicaciones.values_list('idPublicacion', flat=True)
-        # Obtener comentarios relacionados usando la tabla intermedia Poseer
+        # Obtener comentarios en publicaciones
         comentarios = Comentario.objects.filter(
             idComentario__in=Poseer.objects.filter(
                 idPublicacion__in=publicaciones_ids
             ).values_list('idComentario', flat=True)
-        ).order_by('-fecha_creacion', '-hora_creacion')  # Si tu modelo Comentario tiene estos campos
+        ).order_by('-fecha_creacion', '-hora_creacion')
     else:
         comentarios = []
 
     grupo = Grupo.objects.get(codigo=grupo_id)
+    # Busqueda en comentarios
+    form = BusquedaGenericaForm(request.GET or None)
+    if form.is_valid():
+        usuario = form.cleaned_data.get('nombre_usuario')
+        numCuenta = form.cleaned_data.get('numCuenta')
+        fecha = form.cleaned_data.get('fecha')
+
+        if usuario:
+            comentarios = comentarios.filter(numCuenta__nombre_usuario__icontains=usuario)
+        if numCuenta:
+            comentarios = comentarios.filter(numCuenta__numCuenta__icontains=numCuenta)
+        if fecha:
+            comentarios = comentarios.filter(fecha_creacion=fecha)
     return render(request, 'admin/admin_comentarios.html', {
         'grupo' : grupo,
-        'comentarios' : comentarios
+        'comentarios' : comentarios,
+        'is_generic' : True,
+        'form' : form
     })
 
 def unirse_grupo(request):

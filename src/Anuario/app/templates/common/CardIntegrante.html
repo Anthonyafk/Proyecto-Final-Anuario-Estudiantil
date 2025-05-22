@@ -1,8 +1,7 @@
 {% load static %}
-{% load sweetify %}
 
 <div class="d-flex flex-column flex-sm-row align-items-center justify-content-between py-2 border-bottom">
-  <!-- Avatar e información personal -->
+  <!-- Información personal -->
   <div class="d-flex align-items-center text-center text-sm-start mb-2 mb-sm-0">
       <div class="position-absolute">
         {% if integrante.tener.idPerfil.marcofoto_set.first.marco_foto %}
@@ -44,24 +43,3 @@
     {% endif %}
   </div>
 </div>
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-  <script>
-    function confirmExpulsion(redirectUrl) {
-        Swal.fire({
-            title: '¿Estás seguro?',
-            text: "Esta acción expulsará al usuario.",
-            icon: 'warning',
-            showCancelButton: true,
-            confirmButtonColor: '#d33',
-            cancelButtonColor: '#6c757d',
-            confirmButtonText: 'Sí, expulsar',
-            cancelButtonText: 'Cancelar'
-        }).then((result) => {
-            if (result.isConfirmed) {
-                window.location.href = redirectUrl;
-            }
-        });
-    }
-  </script>
-
-{% sweetify %}
