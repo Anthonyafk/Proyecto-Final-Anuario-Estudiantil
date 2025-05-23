@@ -16,18 +16,17 @@ urlpatterns = [
     path('grupos/nuevo/', views.crear_o_editar_grupo, name='crear_grupo'),
     path('grupos/<int:grupo_id>/editar/', views.crear_o_editar_grupo, name='editar_grupo'),
     path('grupos/<int:grupo_id>/publicar/', views.publicar, name='publicar'),
-    path('grupos/<int:grupo_id>/publicacion/editar/<int:publicacion_id>', views.editar_publicacion, name='editar_publicacion'),
-    path('grupos/<int:grupo_id>/publicacion/elimar/<int:publicacion_id>', views.eliminar_publicacion, name='eliminar_publicacion'),
     path('grupos/<int:grupo_id>/comentar/<int:publicacion_id>', views.comentar, name='comentar'),
     path('grupos/<int:grupo_id>/comentarios/<int:publicacion_id>', views.comentarios, name='comentarios'),
-    path('grupos/<int:grupo_id>/comentarios/editar/<int:comentario_id>', views.editar_comentario, name='editar_comentario'),
-    path('grupos/<int:grupo_id>/comentarios/eliminar/<int:comentario_id>', views.eliminar_comentario, name='eliminar_comentario'),
     path('grupos/<int:grupo_id>/admin/alumnos/', views.ad_alumnos, name='ad_alumnos'),
     path('grupos/<int:grupo_id>/admin/publicaciones/', views.ad_publicaciones, name='ad_publicaciones'),
     path('grupos/<int:grupo_id>/admin/comentarios/', views.ad_comentarios, name='ad_comentarios'),
     path('grupos/<int:grupo_id>/admin/expulsar/<int:numCuenta>/', views.expulsar_alumno, name='expulsar_alumno'),
     path("accounts/signup/", views.signup, name="signup"),
     path("accounts/", include("django.contrib.auth.urls")),  # new
+    path('grupos/<int:grupo_id>/nominaciones/editar/', views.editar_duracion_nominaciones, name='editar_duracion_nominaciones'),
+    path('nominaciones/<int:idNominacion>/resultados/', views.resultados_votacion, name='resultados_votacion'),
+    path('grupos/<str:codigo_grupo>/ganadores/', views.resultados_votacion, name='ver_ganadores'),
     #path("", TemplateView.as_view(template_name="home.html"), name="home")  # new
     path("",views.home, name="home")
 ]

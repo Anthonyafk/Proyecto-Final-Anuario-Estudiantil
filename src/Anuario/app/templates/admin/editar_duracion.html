@@ -1,0 +1,48 @@
+{% extends 'base.html' %}
+{% load static %}
+
+<!--Obtiene la fecha y hora actual -->
+{% load tz %}
+{% timezone "America/Mexico_City" %}
+    {{ nominacion.existe.fecha_inicio|date:"DATETIME_FORMAT" }}
+{% endtimezone %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2>Editar Duración de Nominaciones - {{ grupo.nombre }}</h2>
+    
+    <form method="post">
+        {% csrf_token %}
+        
+        <div class="card shadow-sm mb-4">
+            <div class="card-body">
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <label class="form-label">Fecha de Inicio</label>
+                        {{ form.fecha_inicio }}
+                        {% if form.fecha_inicio.errors %}
+                            <div class="text-danger">{{ form.fecha_inicio.errors }}</div>
+                        {% endif %}
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">Fecha de Fin</label>
+                        {{ form.fecha_fin }}
+                        {% if form.fecha_fin.errors %}
+                            <div class="text-danger">{{ form.fecha_fin.errors }}</div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="d-flex justify-content-between">
+            <a href="{% url 'nominaciones' grupo.codigo %}" class="btn btn-secondary">
+                <i class="fas fa-arrow-left"></i> Cancelar
+            </a>
+            <button type="submit" class="btn btn-primary">
+                <i class="fas fa-save"></i> Guardar Cambios
+            </button>
+        </div>
+    </form>
+</div>
+{% endblock %}

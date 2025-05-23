@@ -1,0 +1,93 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container py-4">
+    <!-- Muestra solo los ganadores de las categorías que ya cerraron -->
+    <div class="card shadow mb-4">
+        <div class="card-header bg-primary text-white">
+            <h2 class="mb-0">
+                <i class="fas fa-trophy me-2"></i> Ganadores de Todas las Categorías
+            </h2>
+        </div>
+        <div class="card-body">
+            {% if mostrar_ganadores %}
+                <div class="row">
+                    {% for item in categorias_con_ganadores %}
+                    <div class="col-md-6 mb-4">
+                        <div class="card h-100 border-success">
+                            <div class="card-header bg-success text-white">
+                                <h3 class="mb-0">{{ item.categoria }}</h3>
+                            </div>
+                            <div class="card-body text-center">
+                                <div class="d-flex justify-content-center mb-3">
+                                    <i class="fas fa-crown fa-3x text-warning"></i>
+                                </div>
+                                
+                                {% if item.es_empate %}
+                                    <h4>¡Empate!</h4>
+                                    <div class="empate-container">
+                                        {% for ganador in item.ganadores %}
+                                        <div class="ganador-empate mb-3 p-3 bg-light rounded">
+                                            <h5>{{ ganador.alumnoVotado__nombre }} {{ ganador.alumnoVotado__primer_apellido }}</h5>
+                                            <div class="mt-2">
+                                                <span class="badge bg-primary rounded-pill fs-6">
+                                                    {{ item.max_votos }} votos
+                                                </span>
+                                            </div>
+                                            <small class="text-muted d-block mt-1">
+                                                ID: {{ ganador.alumnoVotado__numCuenta }}
+                                            </small>
+                                        </div>
+                                        {% endfor %}
+                                    </div>
+                                {% else %}
+                                    {% with ganador=item.ganadores.0 %}
+                                    <h4>{{ ganador.alumnoVotado__nombre }} {{ ganador.alumnoVotado__primer_apellido }}</h4>
+                                    <div class="mt-3">
+                                        <span class="badge bg-primary rounded-pill fs-6">
+                                            {{ item.max_votos }} votos
+                                        </span>
+                                    </div>
+                                    <small class="text-muted d-block mt-2">
+                                        ID: {{ ganador.alumnoVotado__numCuenta }}
+                                    </small>
+                                    {% endwith %}
+                                {% endif %}
+                            </div>
+                            <div class="card-footer bg-light">
+                                <small class="text-muted">
+                                    Finalizado el {{ item.existe.fecha_fin|date:"d/m/Y" }}
+                                </small>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div class="alert alert-info text-center">
+                    <i class="fas fa-info-circle fa-2x mb-3"></i>
+                    <h4>No hay categorías finalizadas aún</h4>
+                    <p class="mb-0">Los ganadores se mostrarán aquí una vez que cierren las votaciones</p>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<style>
+.empate-container {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+.ganador-empate {
+    border: 1px solid #dee2e6;
+    transition: all 0.3s ease;
+}
+.ganador-empate:hover {
+    background-color: #f8f9fa !important;
+    box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+}
+</style>
+{% endblock %}
