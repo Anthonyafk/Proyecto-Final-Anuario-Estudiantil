@@ -3,15 +3,16 @@ import string
 import sweetify
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
-from .models import Usuario, Grupo, Comentario, Publicacion, Nominacion, Perfil, Tener, Pertenecer, Postular, Votar, MarcoFoto, Ganar, Comentario, Gestionar, Poseer, Marco # .... etc.
-from .forms import UsuarioRegistroForm, UsuarioBusquedaNominacion, PerfilForm, DejarComentario, GroupJoinForm, GrupoForm, PublicacionForm, BusquedaGenericaForm, EditarPublicacionForm
+from .models import Usuario, Grupo, Comentario, Publicacion, Nominacion, Perfil, Tener, Pertenecer, Postular, Votar, MarcoFoto, Ganar, Comentario, Gestionar, Poseer, Marco, Existe, Count # .... etc.
+from .forms import UsuarioRegistroForm, UsuarioBusquedaNominacion, PerfilForm, DejarComentario, GroupJoinForm, GrupoForm, PublicacionForm, EditarDuracionNominacionesForm
 from django.contrib.auth import authenticate, login
 from django.db import IntegrityError
-from django.contrib.auth.decorators import login_required
+from django.contrib.auth.decorators import login_required, user_passes_test
 from django.contrib.admin.views.decorators import staff_member_required
 from datetime import date
 from datetime import datetime
 from django.shortcuts import HttpResponse #prueba
+from django.utils import timezone
 
 def index(request):
     contextosinpretexto = {
@@ -68,38 +69,62 @@ def home(request):
     return render(request, "home.html", { 'grupos' : grupos })
 
 #Esta funcion esta disponible sii existe al menos un grupo en la vista home
-def nominaciones(request,grupo_id):
+def nominaciones(request, grupo_id):
     grupo = Grupo.objects.get(codigo=grupo_id)
-    nominaciones = Nominacion.objects.filter(activa=True,existe__codigo__codigo=grupo_id)
-    return render(request, "nomination/all-nominations.html", {'nominaciones': nominaciones,'grupo':grupo})
+    ahora = timezone.now() #Se agregó para tener la fecha y zona horario actual en las nominaciones
+    
+    # Solo se muestran nominaciones activas
+    nominaciones = Nominacion.objects.filter(
+        activa=True,
+        existe__codigo__codigo=grupo_id,
+        existe__fecha_inicio__lte=ahora,
+        existe__fecha_fin__gte=ahora
+    )
+    
+    # Verificar si el usuario es admin para mostrar el enlace de edición
+    es_admin = request.user.is_superuser
+    
+    return render(request, "nomination/all-nominations.html", {
+        'nominaciones': nominaciones,
+        'grupo': grupo,
+        'es_admin': es_admin
+    })
 
 #Función para mostrar la descripción de la nominación, junto con los estudiantes a votar y el botón para postularse
 def verNominacion(request, idNominacion):
     #No se debe habilitar la opción de postularse si el usuario ya esta inscrito 
     numCuenta = request.user
     formBusqueda = UsuarioBusquedaNominacion()
-
+    
     desabilitarPostulacion = ""
     desabilitarVotacion = ""
     dato = ""
-    #inscrito = False
-
+    
     marcos = MarcoFoto.objects.all()
-
+    
     nominacion = Nominacion.objects.get(pk = idNominacion)
     inscritos = Postular.objects.filter(idNominacion = idNominacion)
-
+    
     usuarioInscrito = inscritos.filter(numCuenta = numCuenta)
 
+    # Verificar si la nominación está activa y dentro del período de activación
+    ahora = timezone.now()
+    existe = Existe.objects.filter(idNominacion=nominacion).first()
+
+    if not existe or ahora < existe.fecha_inicio or ahora > existe.fecha_fin:
+        messages.error(request, "Esta nominación no está disponible en este momento.")
+        return redirect('nominaciones', grupo_id=existe.codigo.codigo)
+    
     if(usuarioInscrito.exists()):
         desabilitarPostulacion = "style= display:none;"
-
+        inscritos = inscritos.exclude(numCuenta = numCuenta)
+    
     votoAntes = Votar.objects.filter(idNominacion = idNominacion)
     votoAntes = votoAntes.filter(numCuenta = numCuenta.numCuenta)
-
+    
     if(votoAntes.exists()):
         desabilitarVotacion = "style=display:none;"
-
+    
     if(request.method == "POST"):
         if 'Postular' in request.POST:
             postular = Postular(numCuenta = numCuenta, idNominacion = nominacion)
@@ -119,16 +144,8 @@ def verNominacion(request, idNominacion):
                     inscritos = inscritos.filter(numCuenta__nombre__icontains = nombre) | inscritos.filter(numCuenta__primer_apellido__icontains = nombre) | inscritos.filter(numCuenta__segundo_apellido__icontains = nombre)
             if(not nombreCompleto):
                 dato = 'Busqueda vacia.'
-    print(inscritos)
-    return render(request, "nomination/nomination.html", {
-        'nominacion':nominacion,
-        'inscritos':inscritos,
-        'desabilitarPostulacion':desabilitarPostulacion,
-        'formBusqueda':formBusqueda,
-        'dato':dato,
-        'desabilitarVotacion':desabilitarVotacion,
-        'marcos':marcos,
-    })
+    
+    return render(request, "nomination/nomination.html", {'nominacion':nominacion, 'inscritos':inscritos, 'desabilitarPostulacion':desabilitarPostulacion, 'formBusqueda':formBusqueda, 'dato':dato, 'desabilitarVotacion':desabilitarVotacion, 'marcos':marcos})
 
 #Funcion para acceder al perfil del usuario
 def verPerfil(request, usuario_id):
@@ -322,44 +339,6 @@ def comentar(request, grupo_id, publicacion_id):
 
     return redirect('detalle_grupo', grupo_id=grupo_id)
 
-def editar_comentario(request, grupo_id, comentario_id):
-    grupo = Grupo.objects.get(codigo=grupo_id)
-    comentario = Comentario.objects.get(idComentario=comentario_id)
-
-    form = DejarComentario()
-    if request.method=="POST":
-        form = DejarComentario(request.POST)
-        if form.is_valid():
-            contenido = form.cleaned_data['comentario']
-            fecha_creacion = date.today()
-            now = datetime.now()
-
-            if contenido:
-                comentario.contenido = contenido
-                comentario.fecha_creacion = fecha_creacion
-                comentario.hora_creacion = now
-            comentario.save()
-            sweetify.success(
-                request,
-                'Comentario editado',
-                text='Los datos se actualizaron correctamente.',
-                persistent='OK'
-            )
-            return redirect('detalle_grupo', grupo_id=grupo_id)
-
-    return render(request, "grupos/editar_comentario.html",{
-        'grupo' : grupo,
-        'comentario' : comentario,
-        'form' : form
-    })
-
-def eliminar_comentario(request, grupo_id, comentario_id):
-    comentario = get_object_or_404(Comentario, idComentario=comentario_id)
-    comentario.delete()
-
-    sweetify.success(request, 'Comentario eliminado', text='El comentario ha sido eliminado', persistent='OK')
-    return redirect('ad_comentarios', grupo_id=grupo_id)
-
 def publicar(request, grupo_id):
     grupo = Grupo.objects.get(codigo=grupo_id)
 
@@ -369,6 +348,16 @@ def publicar(request, grupo_id):
             data = form.cleaned_data
             fecha_creacion = date.today()
             now = datetime.now()
+
+            publicacion = Publicacion.objects.create(
+                numCuenta=request.user,
+                codigo=grupo,
+                fecha_creacion=fecha_creacion,
+                hora_creacion=now.time(),
+                descripcion=data['descripcion'],
+                imagen=data.get('imagen'),
+                video_url=None
+            )
 
             sweetify.success(
                 request,
@@ -385,47 +374,6 @@ def publicar(request, grupo_id):
         'grupo': grupo,
         'form': form
     })
-
-def editar_publicacion(request, grupo_id, publicacion_id):
-    grupo = Grupo.objects.get(codigo=grupo_id)
-    publicacion = Publicacion.objects.get(idPublicacion=publicacion_id)
-
-    form = EditarPublicacionForm()
-    if request.method=="POST":
-        form = EditarPublicacionForm(request.POST, request.FILES)
-        if form.is_valid():
-            descripcion = form.cleaned_data['descripcion']
-            fecha_creacion = date.today()
-            now = datetime.now()
-            imagen = form.cleaned_data['imagen']
-
-            if descripcion:
-                publicacion.descripcion = descripcion
-                publicacion.fecha_creacion = fecha_creacion
-                publicacion.hora_creacion = now
-            if imagen:
-                publicacion.image = imagen
-            publicacion.save()
-            sweetify.success(
-                request,
-                'Publicacion editada',
-                text='Los datos se actualizaron correctamente.',
-                persistent='OK'
-            )
-            return redirect('detalle_grupo', grupo_id=grupo_id)
-
-    return render(request, "grupos/editar_publicacion.html",{
-        'grupo' : grupo,
-        'publicacion' : publicacion,
-        'form' : form
-    })
-
-def eliminar_publicacion(request, grupo_id, publicacion_id):
-    publicacion = get_object_or_404(Publicacion, idPublicacion=publicacion_id)
-    publicacion.delete()
-
-    sweetify.success(request, 'Publicacion eliminada', text='La publicacion ha sido eliminada', persistent='OK')
-    return redirect('ad_publicaciones', grupo_id=grupo_id)
 
 def expulsar_alumno(request, grupo_id, numCuenta):
     pertenencia = get_object_or_404(Pertenecer, codigo__codigo=grupo_id, numCuenta__numCuenta=numCuenta)
@@ -451,64 +399,34 @@ def get_publicaciones(request, grupo_id):
     ).order_by('-fecha_creacion', '-hora_creacion')
     return publicaciones
 
-@staff_member_required
 def ad_publicaciones(request, grupo_id):
+    # Subconsulta: obtener publicaciones de alumnos que pertenecen al grupo
     grupo = Grupo.objects.get(codigo=grupo_id)
-    publicaciones = get_publicaciones(request, grupo_id) # Publicaciones del grupo
-    form = BusquedaGenericaForm(request.GET or None)
-    if form.is_valid():
-        usuario = form.cleaned_data.get('nombre_usuario')
-        numCuenta = form.cleaned_data.get('numCuenta')
-        fecha = form.cleaned_data.get('fecha')
-
-        if usuario:
-            publicaciones = publicaciones.filter(numCuenta__nombre_usuario__icontains=usuario)
-        if numCuenta:
-            publicaciones = publicaciones.filter(numCuenta__numCuenta__icontains=numCuenta)
-        if fecha:
-            publicaciones = publicaciones.filter(fecha_creacion=fecha)
+    publicaciones = get_publicaciones(request, grupo_id)
 
     return render(request, 'admin/admin_publicaciones.html', {
         'publicaciones': publicaciones,
-        'grupo' : grupo,
-        'is_generic' : True,
-        'form' : form
+        'grupo' : grupo
     })
 
-@staff_member_required
 def ad_comentarios(request, grupo_id):
     # Obtener publicaciones del grupo
     publicaciones = get_publicaciones(request,grupo_id)
     if publicaciones:
         publicaciones_ids = publicaciones.values_list('idPublicacion', flat=True)
-        # Obtener comentarios en publicaciones
+        # Obtener comentarios relacionados usando la tabla intermedia Poseer
         comentarios = Comentario.objects.filter(
             idComentario__in=Poseer.objects.filter(
                 idPublicacion__in=publicaciones_ids
             ).values_list('idComentario', flat=True)
-        ).order_by('-fecha_creacion', '-hora_creacion')
+        ).order_by('-fecha_creacion', '-hora_creacion')  # Si tu modelo Comentario tiene estos campos
     else:
         comentarios = []
 
     grupo = Grupo.objects.get(codigo=grupo_id)
-    # Busqueda en comentarios
-    form = BusquedaGenericaForm(request.GET or None)
-    if form.is_valid():
-        usuario = form.cleaned_data.get('nombre_usuario')
-        numCuenta = form.cleaned_data.get('numCuenta')
-        fecha = form.cleaned_data.get('fecha')
-
-        if usuario:
-            comentarios = comentarios.filter(numCuenta__nombre_usuario__icontains=usuario)
-        if numCuenta:
-            comentarios = comentarios.filter(numCuenta__numCuenta__icontains=numCuenta)
-        if fecha:
-            comentarios = comentarios.filter(fecha_creacion=fecha)
     return render(request, 'admin/admin_comentarios.html', {
         'grupo' : grupo,
-        'comentarios' : comentarios,
-        'is_generic' : True,
-        'form' : form
+        'comentarios' : comentarios
     })
 
 def unirse_grupo(request):
@@ -587,3 +505,110 @@ def generar_codigo_grupo(length=7):
 # Función para buscar un grupo por su código
 def buscar_grupo_por_codigo(codigo):
     return Grupo.objects.filter(codigo_acceso=codigo).first()
+
+#Función para cambiar la duración de las nominaciones
+def editar_duracion_nominaciones(request, grupo_id):
+    grupo = get_object_or_404(Grupo, codigo=grupo_id)
+    nominaciones_grupo = Existe.objects.filter(codigo=grupo)
+    
+    if not nominaciones_grupo.exists():
+        messages.warning(request, "No hay nominaciones para este grupo.")
+        return redirect('nominaciones', grupo_id=grupo.codigo)
+    
+    # damos la misma duración a todas las categorías de un mismo grupo
+    nominacion_referencia = nominaciones_grupo.first()
+    
+    if request.method == 'POST':
+        form = EditarDuracionNominacionesForm(request.POST, instance=nominacion_referencia)
+        if form.is_valid():
+            # Actualiza todas las nominaciones del grupo con la misma duración
+            nominaciones_grupo.update(
+                fecha_inicio=form.cleaned_data['fecha_inicio'],
+                fecha_fin=form.cleaned_data['fecha_fin']
+            )
+            messages.success(request, "La duración de las nominaciones ha sido actualizada.")
+            return redirect('nominaciones', grupo_id=grupo.codigo)
+    else:
+        form = EditarDuracionNominacionesForm(instance=nominacion_referencia)
+    
+    return render(request, 'admin/editar_duracion.html', {
+        'form': form,
+        'grupo': grupo,
+    })
+
+#Función para ver los resultados de las nominaciones
+def resultados_votacion(request, idNominacion=None, codigo_grupo=None):
+    ahora = timezone.now()
+    
+    # Muestra todos los ganadores por categoría (vista general)
+    if codigo_grupo:  
+        nominaciones = Nominacion.objects.all()
+        categorias_con_ganadores = []
+        
+        for nominacion in nominaciones:
+            existe = nominacion.existe_set.first()
+            
+            # Solo procesa nominaciones que ya terminaron
+            if existe and existe.fecha_fin < ahora:
+                resultados = Votar.objects.filter(idNominacion=nominacion).values(
+                    'alumnoVotado__numCuenta',
+                    'alumnoVotado__nombre',
+                    'alumnoVotado__primer_apellido'
+                ).annotate(
+                    total_votos=Count('alumnoVotado')
+                ).order_by('-total_votos')
+                
+                if resultados:
+                    max_votos = resultados[0]['total_votos']
+                    ganadores = [r for r in resultados if r['total_votos'] == max_votos]
+                    
+                    categorias_con_ganadores.append({
+                        'categoria': nominacion.categoria,
+                        'ganadores': ganadores,
+                        'es_empate': len(ganadores) > 1,
+                        'existe': existe,
+                        'max_votos': max_votos
+                    })
+        
+        return render(request, 'nomination/ganadores.html', {
+            'vista_ganadores': True,
+            'categorias_con_ganadores': categorias_con_ganadores,
+            'mostrar_ganadores': len(categorias_con_ganadores) > 0
+        })
+    
+    # Vista individual de una nominación específica
+    nominacion = get_object_or_404(Nominacion, pk=idNominacion)
+    existe = nominacion.existe_set.first()
+    
+    # Verifica estado de la votación
+    votacion_activa = existe and existe.fecha_inicio <= ahora <= existe.fecha_fin
+    votacion_cerrada = existe and existe.fecha_fin < ahora
+    
+    # Obtiene resultados
+    resultados = Votar.objects.filter(idNominacion=nominacion).values(
+        'alumnoVotado__numCuenta',
+        'alumnoVotado__nombre',
+        'alumnoVotado__primer_apellido'
+    ).annotate(
+        total_votos=Count('alumnoVotado')
+    ).order_by('-total_votos')
+
+    # Determina ganador(es)
+    ganadores = []
+    max_votos = 0
+    if resultados:
+        max_votos = resultados[0]['total_votos']
+        ganadores = [r for r in resultados if r['total_votos'] == max_votos]
+    
+    return render(request, 'nomination/resultados_individuales.html', {
+        'nominacion': nominacion,
+        'resultados': resultados,
+        'votacion_activa': votacion_activa,
+        'votacion_cerrada': votacion_cerrada,
+        'mostrar_resultados': nominacion.mostrar_resultados,
+        'ganadores': ganadores,
+        'es_empate': len(ganadores) > 1,
+        'max_votos': max_votos,
+        'no_hay_nominaciones_activas': not votacion_activa and not votacion_cerrada,
+        'vista_ganadores': False  # Importante para el template
+    })
