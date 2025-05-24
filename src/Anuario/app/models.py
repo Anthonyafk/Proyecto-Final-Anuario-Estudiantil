@@ -2,6 +2,7 @@ from django.db import models
 from django.core.validators import RegexValidator
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
 import pgtrigger
+from django.db.models import Count
 
 # Necesario para manerjar la creación de usuarios con un modelo propio
 class UsuarioManager(BaseUserManager):
@@ -148,6 +149,16 @@ class Nominacion(models.Model):
     categoria = models.CharField(max_length=50)
     descripcion = models.TextField(blank=True)
     activa = models.BooleanField(default=True)
+    mostrar_resultados = models.BooleanField(default=True)
+
+    #Musetra el ganador de la categoría cerrada
+    def ganador(self):
+        votos = Votar.objects.filter(idNominacion=self)
+        if votos.exists():
+            return votos.values('alumnoVotado').annotate(
+                total=Count('alumnoVotado')
+            ).order_by('-total').first()
+        return None
 
     class Meta:
         triggers = [
@@ -228,7 +239,7 @@ class Gestionar(models.Model):
     class Meta:
         unique_together = (('numCuenta', 'codigo'),)
         verbose_name = "Gestionar"          # Para mostrar correctamente el nombre de gestionar en la interfaz de administración de Django
-        verbose_name_plural = "Gestionar"  
+        verbose_name_plural = "Gestionar"
 
 
 class Pertenecer(models.Model):

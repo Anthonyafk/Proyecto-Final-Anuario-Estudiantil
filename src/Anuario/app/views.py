@@ -3,15 +3,16 @@ import string
 import sweetify
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
-from .models import Usuario, Grupo, Comentario, Publicacion, Nominacion, Perfil, Tener, Pertenecer, Postular, Votar, MarcoFoto, Ganar, Comentario, Gestionar, Poseer, Marco # .... etc.
-from .forms import UsuarioRegistroForm, UsuarioBusquedaNominacion, PerfilForm, DejarComentario, GroupJoinForm, GrupoForm, PublicacionForm, BusquedaGenericaForm, EditarPublicacionForm
+from .models import Usuario, Grupo, Comentario, Publicacion, Nominacion, Perfil, Tener, Pertenecer, Postular, Votar, MarcoFoto, Ganar, Comentario, Gestionar, Poseer, Marco, Existe, Count
+from .forms import UsuarioRegistroForm, UsuarioBusquedaNominacion, PerfilForm, DejarComentario, GroupJoinForm, GrupoForm, PublicacionForm, BusquedaGenericaForm, EditarPublicacionForm, EditarDuracionNominacionesForm
 from django.contrib.auth import authenticate, login
 from django.db import IntegrityError
-from django.contrib.auth.decorators import login_required
+from django.contrib.auth.decorators import login_required, user_passes_test
 from django.contrib.admin.views.decorators import staff_member_required
 from datetime import date
 from datetime import datetime
 from django.shortcuts import HttpResponse #prueba
+from django.utils import timezone
 
 def index(request):
     contextosinpretexto = {
@@ -70,8 +71,24 @@ def home(request):
 #Esta funcion esta disponible sii existe al menos un grupo en la vista home
 def nominaciones(request,grupo_id):
     grupo = Grupo.objects.get(codigo=grupo_id)
-    nominaciones = Nominacion.objects.filter(activa=True,existe__codigo__codigo=grupo_id)
-    return render(request, "nomination/all-nominations.html", {'nominaciones': nominaciones,'grupo':grupo})
+    ahora = timezone.now() #Se agregó para tener la fecha y zona horario actual en las nominaciones
+
+    # Solo se muestran nominaciones activas
+    nominaciones = Nominacion.objects.filter(
+        activa=True,
+        existe__codigo__codigo=grupo_id,
+        existe__fecha_inicio__lte=ahora,
+        existe__fecha_fin__gte=ahora
+    )
+
+    # Verificar si el usuario es admin para mostrar el enlace de edición
+    es_admin = request.user.is_superuser
+
+    return render(request, "nomination/all-nominations.html", {
+        'nominaciones': nominaciones,
+        'grupo': grupo,
+        'es_admin': es_admin
+    })
 
 #Función para mostrar la descripción de la nominación, junto con los estudiantes a votar y el botón para postularse
 def verNominacion(request, idNominacion):
@@ -90,6 +107,14 @@ def verNominacion(request, idNominacion):
     inscritos = Postular.objects.filter(idNominacion = idNominacion)
 
     usuarioInscrito = inscritos.filter(numCuenta = numCuenta)
+
+    # Verificar si la nominación está activa y dentro del período de activación
+    ahora = timezone.now()
+    existe = Existe.objects.filter(idNominacion=nominacion).first()
+
+    if not existe or ahora < existe.fecha_inicio or ahora > existe.fecha_fin:
+        messages.error(request, "Esta nominación no está disponible en este momento.")
+        return redirect('nominaciones', grupo_id=existe.codigo.codigo)
 
     if(usuarioInscrito.exists()):
         desabilitarPostulacion = "style= display:none;"
@@ -370,6 +395,16 @@ def publicar(request, grupo_id):
             fecha_creacion = date.today()
             now = datetime.now()
 
+            publicacion = Publicacion.objects.create(
+                numCuenta=request.user,
+                codigo=grupo,
+                fecha_creacion=fecha_creacion,
+                hora_creacion=now.time(),
+                descripcion=data['descripcion'],
+                imagen=data.get('imagen'),
+                video_url=None
+            )
+
             sweetify.success(
                 request,
                 '¡Publicación realizada!',
@@ -587,3 +622,111 @@ def generar_codigo_grupo(length=7):
 # Función para buscar un grupo por su código
 def buscar_grupo_por_codigo(codigo):
     return Grupo.objects.filter(codigo_acceso=codigo).first()
+
+#Función para cambiar la duración de las nominaciones
+def editar_duracion_nominaciones(request, grupo_id):
+    grupo = get_object_or_404(Grupo, codigo=grupo_id)
+    nominaciones_grupo = Existe.objects.filter(codigo=grupo)
+
+    if not nominaciones_grupo.exists():
+        messages.warning(request, "No hay nominaciones para este grupo.")
+        return redirect('nominaciones', grupo_id=grupo.codigo)
+
+    # damos la misma duración a todas las categorías de un mismo grupo
+    nominacion_referencia = nominaciones_grupo.first()
+
+    if request.method == 'POST':
+        form = EditarDuracionNominacionesForm(request.POST, instance=nominacion_referencia)
+        if form.is_valid():
+            # Actualiza todas las nominaciones del grupo con la misma duración
+            nominaciones_grupo.update(
+                fecha_inicio=form.cleaned_data['fecha_inicio'],
+                fecha_fin=form.cleaned_data['fecha_fin']
+            )
+            messages.success(request, "La duración de las nominaciones ha sido actualizada.")
+            return redirect('nominaciones', grupo_id=grupo.codigo)
+    else:
+        form = EditarDuracionNominacionesForm(instance=nominacion_referencia)
+
+    return render(request, 'admin/editar_duracion.html', {
+        'form': form,
+        'grupo': grupo,
+    })
+
+#Función para ver los resultados de las nominaciones
+def resultados_votacion(request, idNominacion=None, codigo_grupo=None):
+    ahora = timezone.now()
+
+    # Muestra todos los ganadores por categoría (vista general)
+    if codigo_grupo:
+        nominaciones = Nominacion.objects.all()
+        categorias_con_ganadores = []
+
+        for nominacion in nominaciones:
+            existe = nominacion.existe_set.first()
+
+            # Solo procesa nominaciones que ya terminaron
+            if existe and existe.fecha_fin < ahora:
+                resultados = Votar.objects.filter(idNominacion=nominacion).values(
+                    'alumnoVotado__numCuenta',
+                    'alumnoVotado__nombre',
+                    'alumnoVotado__primer_apellido'
+                ).annotate(
+                    total_votos=Count('alumnoVotado')
+                ).order_by('-total_votos')
+
+                if resultados:
+                    max_votos = resultados[0]['total_votos']
+                    ganadores = [r for r in resultados if r['total_votos'] == max_votos]
+
+                    categorias_con_ganadores.append({
+                        'categoria': nominacion.categoria,
+                        'ganadores': ganadores,
+                        'es_empate': len(ganadores) > 1,
+                        'existe': existe,
+                        'max_votos': max_votos
+                    })
+
+        return render(request, 'nomination/ganadores.html', {
+            'vista_ganadores': True,
+            'categorias_con_ganadores': categorias_con_ganadores,
+            'mostrar_ganadores': len(categorias_con_ganadores) > 0
+        })
+
+    # Vista individual de una nominación específica
+    nominacion = get_object_or_404(Nominacion, pk=idNominacion)
+    existe = nominacion.existe_set.first()
+
+    # Verifica estado de la votación
+    votacion_activa = existe and existe.fecha_inicio <= ahora <= existe.fecha_fin
+    votacion_cerrada = existe and existe.fecha_fin < ahora
+
+    # Obtiene resultados
+    resultados = Votar.objects.filter(idNominacion=nominacion).values(
+        'alumnoVotado__numCuenta',
+        'alumnoVotado__nombre',
+        'alumnoVotado__primer_apellido'
+    ).annotate(
+        total_votos=Count('alumnoVotado')
+    ).order_by('-total_votos')
+
+    # Determina ganador(es)
+    ganadores = []
+    max_votos = 0
+
+    if resultados:
+        max_votos = resultados[0]['total_votos']
+        ganadores = [r for r in resultados if r['total_votos'] == max_votos]
+
+    return render(request, 'nomination/resultados_individuales.html', {
+        'nominacion': nominacion,
+        'resultados': resultados,
+        'votacion_activa': votacion_activa,
+        'votacion_cerrada': votacion_cerrada,
+        'mostrar_resultados': nominacion.mostrar_resultados,
+        'ganadores': ganadores,
+        'es_empate': len(ganadores) > 1,
+        'max_votos': max_votos,
+        'no_hay_nominaciones_activas': not votacion_activa and not votacion_cerrada,
+        'vista_ganadores': False  # Importante para el template
+    })

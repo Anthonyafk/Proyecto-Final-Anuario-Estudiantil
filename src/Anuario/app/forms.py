@@ -1,6 +1,6 @@
 from django import forms
 from django.contrib.auth.forms import UserCreationForm
-from .models import Usuario, Perfil, Grupo, Tener
+from .models import Usuario, Perfil, Grupo, Tener, Existe
 
 # Formulario para el registro de un usuario.
 # Cada campo es necesario para la base de datos
@@ -206,3 +206,13 @@ class EditarPublicacionForm(forms.Form):
             'class': 'form-control rounded-pill bg-light'
         })
     )
+
+# Formulario para editar tiempo de nominaciones
+class EditarDuracionNominacionesForm(forms.ModelForm):
+    class Meta:
+        model = Existe
+        fields = ['fecha_inicio', 'fecha_fin']
+        widgets = {
+            'fecha_inicio': forms.DateTimeInput(attrs={'type': 'datetime-local'}),
+            'fecha_fin': forms.DateTimeInput(attrs={'type': 'datetime-local'}),
+        }

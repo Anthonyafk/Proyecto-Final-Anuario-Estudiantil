@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Grupo, Pertenecer, Gestionar
+from .models import Grupo, Pertenecer, Gestionar, Nominacion
 
 # Funciones para el admin de Django
 
@@ -24,3 +24,9 @@ class GestionarAdmin(admin.ModelAdmin):
 @admin.register(Pertenecer)
 class PertenecerAdmin(admin.ModelAdmin):
     list_display = ('numCuenta', 'codigo',)
+
+#Para cambiar la duración de laa nominaciones
+@admin.register(Nominacion)
+class NominacionAdmin(admin.ModelAdmin):
+    list_display = ('categoria', 'activa', 'mostrar_resultados')
+    list_editable = ('mostrar_resultados',)

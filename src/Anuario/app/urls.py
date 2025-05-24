@@ -28,6 +28,9 @@ urlpatterns = [
     path('grupos/<int:grupo_id>/admin/expulsar/<int:numCuenta>/', views.expulsar_alumno, name='expulsar_alumno'),
     path("accounts/signup/", views.signup, name="signup"),
     path("accounts/", include("django.contrib.auth.urls")),  # new
+    path('grupos/<int:grupo_id>/nominaciones/editar/', views.editar_duracion_nominaciones, name='editar_duracion_nominaciones'),
+    path('nominaciones/<int:idNominacion>/resultados/', views.resultados_votacion, name='resultados_votacion'),
+    path('grupos/<str:codigo_grupo>/ganadores/', views.resultados_votacion, name='ver_ganadores'),
     #path("", TemplateView.as_view(template_name="home.html"), name="home")  # new
     path("",views.home, name="home")
 ]
