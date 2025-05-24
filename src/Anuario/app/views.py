@@ -605,14 +605,14 @@ def crear_o_editar_grupo(request, grupo_id=None):
                 nombre=data['nombre'],
                 descripcion=data['descripcion'],
                 foto_portada=data['foto_portada'] or None,
-                codigo_acceso=codigo_generado  # <--- Aquí se guarda el código de acceso
+                codigo_acceso=codigo_generado
             )
             Gestionar.objects.create(numCuenta=request.user, codigo=grupo)
             messages.success(request, f"Grupo creado correctamente. El código de acceso es: {codigo_generado}")
+            return redirect('detalle_grupo', grupo_id=grupo.codigo)  # Solo aquí redirige
 
-        return redirect('detalle_grupo', grupo_id=grupo.codigo)
-
-    return render(request, 'grupos/gestionar_grupo.html', {'form': form, 'grupo': grupo,})
+    # Si no es POST o el form no es válido, solo renderiza el formulario
+    return render(request, 'grupos/gestionar_grupo.html', {'form': form, 'grupo': grupo})
 
 # Función para generar un código de grupo aleatorio
 def generar_codigo_grupo(length=7):

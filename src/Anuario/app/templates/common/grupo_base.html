@@ -9,6 +9,7 @@
 
   <!-- Enlaces -->
   <nav class="d-flex gap-3">
+    {% if grupo %}
     <a href="{% url 'detalle_grupo' grupo_id=grupo.codigo %}" class="text-dark text-decoration-none">Principal</a>
     <a href="{% url 'nominaciones' grupo_id=grupo.codigo %}" class="text-dark text-decoration-none">Nominaciones</a>
     {% if user.is_superuser %}
@@ -23,8 +24,9 @@
         <li><a class="dropdown-item" href="{% url 'ad_comentarios' grupo_id=grupo.codigo %}">Comentarios</a></li>
       </ul>
     </div>
-    {% else %}
+      {% else %}
       <a href="{% url 'integrantes' grupo_id=grupo.codigo %}" class="text-dark text-decoration-none">Integrantes</a>
+      {% endif %}
     {% endif %}
   </nav>
 </div>
