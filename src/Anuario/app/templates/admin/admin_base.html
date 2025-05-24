@@ -15,17 +15,30 @@
     <div class="col-4 py-3">
       <h2>{% block header %}Administración{% endblock %}</h2>
     </div>
-  <!-- Formulario de búsqueda -->
-  <div class="col">
-  <form method="get" class="my-3">
-    <div class="input-group">
-      {{ form.nombre|add_class:"form-control" | attr:"placeholder:Buscar Estudiante..." }}
-      <button type="submit" class="btn btn-outline-secondary">
-        <i class="fas fa-search"></i>
-      </button>
+    <!-- Formulario de búsqueda -->
+    <div class="col">
+      {% if is_generic %}
+      <form method="get" class="my-3">
+        <div class="input-group">
+          {{ form.nombre_usuario|add_class:"form-control mx-2" | attr:"placeholder:Buscar usuario..." }}
+          {{ form.numCuenta|add_class:"form-control mx-2" | attr:"placeholder:Buscar no. cuenta..." }}
+          {{ form.fecha|add_class:"form-control mx-2"}}
+          <button type="submit" class="btn btn-outline-secondary">
+            <i class="fas fa-search"></i>
+          </button>
+        </div>
+      </form>
+      {% else %}
+      <form method="get" class="my-3">
+        <div class="input-group">
+          {{ form.nombre|add_class:"form-control" | attr:"placeholder:Buscar Estudiante..." }}
+          <button type="submit" class="btn btn-outline-secondary">
+            <i class="fas fa-search"></i>
+          </button>
+        </div>
+      </form>
+      {% endif %}
     </div>
-  </form>
-  </div>
   </div>
 
   <!-- Contenido específico -->
@@ -33,7 +46,6 @@
     <table class="table">
       <tbody>
         {% block admin_content %}
-        <!-- Se sobrescribe en cada vista -->
         {% endblock %}
       </tbody>
     </table>

@@ -1,9 +1,15 @@
+{% extends 'common/grupo_base.html' %}
+{% load widget_tweaks %}
+
+{% block grupo_content %}
+
 <div class="card mb-4 shadow-sm">
+    <!-- Mostrar la publicación -->
 	<div class="card-body">
 		<!-- Encabezado con foto y username -->
 		<div class="d-flex justify-content-between align-items-center mb-2">
         <div class="d-flex align-items-center">
-		        <!-- Imagen de perfil en círculo -->
+		        <!-- Imagen de perfil -->
             {% if publicacion.numCuenta.tener.idPerfil.foto_perfil %}
 					      <img src="{{ publicacion.numCuenta.tener.idPerfil.foto_perfil.url }}" alt="Foto perfil"
               	        class="rounded-circle me-2" width="40" height="40" style="object-fit: cover;">
@@ -29,33 +35,22 @@
                 <img src="{{ publicacion.imagen.url }}" alt="Imagen de la publicación" class="img-fluid rounded">
             </div>
         {% endif %}
-
-        <!-- Video -->
-        {% if publicacion.video_url %}
-            <div class="mb-3">
-                <div class="ratio ratio-16x9">
-                    <iframe src="{{ publicacion.video_url }}" frameborder="0" allowfullscreen></iframe>
-                </div>
-            </div>
-        {% endif %}
-            <form method="POST" action="{% url 'comentar' grupo_id=publicacion.codigo.codigo publicacion_id=publicacion.idPublicacion %}" class="mb-3">
-                {% csrf_token %}
-                <div class="input-group">
-                    {{ form.comentario }}
-                    <button type="submit" class="btn btn-outline-secondary rounded-pill ms-2">
-                        <i class="fas fa-chevron-right"></i>
-                    </button>
-                </div>
-                {% if form.comentario.errors %}
-                    <div class="text-danger small mt-1">{{ form.comentario.errors.0 }}</div>
-                {% endif %}
-            </form>
-
-            <div class="text-end">
-                <a href="{% url 'comentarios' grupo_id=publicacion.codigo.codigo publicacion_id=publicacion.idPublicacion %}" class="text-decoration-none text-muted small">
-                    Ver todos los comentarios
-                    <i class="fas fa-comments ms-1"></i>
-                </a>
-            </div>
+  </div>
+    <!-- Mostrar comentarios -->
+    <div class="card shadow-sm">
+        <div class="card-body">
+            <h5 class="card-title">Comentarios</h5>
+            {% if comentarios %}
+                <ul class="list-group list-group-flush">
+                    {% for comentario in comentarios %}
+                        {% include 'common/CardComentarios.html' with comentario=comentario %}
+                    {% endfor %}
+                </ul>
+            {% else %}
+                <p class="text-muted">No hay comentarios aún.</p>
+            {% endif %}
         </div>
     </div>
+</div>
+{% endblock %}
+

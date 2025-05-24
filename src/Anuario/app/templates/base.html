@@ -99,6 +99,25 @@
     }
 </script>
 
+  <script>
+    function confirmarEliminacion(redirectUrl) {
+        Swal.fire({
+            title: '¿Estás seguro?',
+            text: "Esta accion es permanente.",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#d33',
+            cancelButtonColor: '#6c757d',
+            confirmButtonText: 'Sí, eliminar',
+            cancelButtonText: 'Cancelar'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                window.location.href = redirectUrl;
+            }
+        });
+    }
+  </script>
+
 {% load sweetify %}
 {% sweetify %}
 </body>

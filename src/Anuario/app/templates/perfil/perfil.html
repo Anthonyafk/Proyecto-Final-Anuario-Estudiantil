@@ -50,8 +50,8 @@ inset-block-start: -10px;">
     <h4 class="mb-1" style="padding: 1%">{{ usuario.nombre_usuario}}</h4>
     <!--Verifica si el que está viendo el perfil es el dueño de la cuenta, de ser 
     así muestra el botón de "editar perfil"-->
-    {% if request.user.numCuenta == usuario.numCuenta %}
-      <a href="{% url 'editar_perfil' %}" class="btn btn-primary">Editar Perfil</a>
+    {% if request.user.numCuenta == usuario.numCuenta or request.user.is_superuser%}
+      <a href="{% url 'editar_perfil' usuario_id=usuario.numCuenta %}" class="btn btn-primary">Editar Perfil</a>
     {% endif %}
     
   </div>

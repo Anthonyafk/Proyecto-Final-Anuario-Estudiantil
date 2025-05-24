@@ -1,0 +1,152 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container py-4 flex-grow-1">
+    <!-- Vista para votos individuales -->
+    <div class="card shadow">
+        <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+            <h2 class="mb-0">{{ nominacion.categoria }}</h2>
+            {% if votacion_cerrada %}
+            <button class="btn btn-light" id="toggleGanadorBtn">
+                <i class="fas fa-trophy"></i> Ver Ganador{% if es_empate %}es{% endif %}
+            </button>
+            {% endif %}
+        </div>
+        
+        <div class="card-body">
+            {% if not mostrar_resultados %}
+                <div class="alert alert-warning text-center">
+                    <i class="fas fa-lock fa-2x mb-3"></i>
+                    <h4>Resultados no disponibles</h4>
+                    <p>Los resultados se publicarán oficialmente al finalizar</p>
+                </div>
+            
+            {% elif votacion_activa %}
+                <!-- Si las votaciones siguen abiertas muestra el progreso de los votos -->
+                <h4 class="text-muted mb-4">
+                    <i class="fas fa-chart-line"></i> Progreso de votaciones
+                </h4>
+                
+                {% if resultados %}
+                <div class="list-group">
+                    {% for resultado in resultados %}
+                    <div class="list-group-item d-flex justify-content-between align-items-center">
+                        <div>
+                            <h5 class="mb-1">{{ resultado.alumnoVotado__nombre }} {{ resultado.alumnoVotado__primer_apellido }}</h5>
+                            <small class="text-muted">ID: {{ resultado.alumnoVotado__numCuenta }}</small>
+                        </div>
+                        <span class="badge bg-primary rounded-pill">{{ resultado.total_votos }} votos</span>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <div class="alert alert-info">
+                    <i class="fas fa-info-circle"></i> No hay votos registrados aún
+                </div>
+                {% endif %}
+            
+            {% elif votacion_cerrada %}
+                <!-- Si los votos ya cerraron -->
+                <div id="todosResultados">
+                    <div class="text-center mb-4">
+                        <i class="fas fa-list-ol text-info fa-3x"></i>
+                        <h3 class="mt-2">Resultados completos</h3>
+                    </div>
+                    
+                    {% if resultados %}
+                    <div class="list-group mb-4">
+                        {% for resultado in resultados %}
+                        <div class="list-group-item d-flex justify-content-between align-items-center {% if resultado.total_votos == max_votos %}list-group-item-success{% endif %}">
+                            <div>
+                                <h5 class="mb-1">{{ resultado.alumnoVotado__nombre }} {{ resultado.alumnoVotado__primer_apellido }}</h5>
+                                <small class="text-muted">ID: {{ resultado.alumnoVotado__numCuenta }}</small>
+                            </div>
+                            <span class="badge bg-primary rounded-pill">{{ resultado.total_votos }} votos</span>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% else %}
+                    <div class="alert alert-info">
+                        <i class="fas fa-info-circle"></i> No se registraron votos
+                    </div>
+                    {% endif %}
+                </div>
+
+                <!-- Sección de ganador o ganadores si hay empate -->
+                <div id="ganadorSection" style="display: none;">
+                    <div class="text-center mb-4">
+                        <i class="fas fa-trophy text-warning fa-3x"></i>
+                        <h3 class="mt-2">
+                            {% if es_empate %}¡Ganadores (Empate)!{% else %}¡Ganador oficial!{% endif %}
+                        </h3>
+                    </div>
+                    
+                    {% if es_empate %}
+                        <div class="row">
+                            {% for ganador in ganadores %}
+                            <div class="col-md-6 mb-4">
+                                <div class="card border-success h-100">
+                                    <div class="card-body text-center bg-light">
+                                        <h4 class="text-success">¡FELICIDADES!</h4>
+                                        <h3>{{ ganador.alumnoVotado__nombre }} {{ ganador.alumnoVotado__primer_apellido }}</h3>
+                                        <p class="lead">{{ max_votos }} votos</p>
+                                        <small class="text-muted">ID: {{ ganador.alumnoVotado__numCuenta }}</small>
+                                    </div>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        {% if resultados %}
+                        <div class="card border-success mb-4">
+                            <div class="card-body text-center bg-light">
+                                <h4 class="text-success">¡FELICIDADES!</h4>
+                                <h3>{{ resultados.0.alumnoVotado__nombre }} {{ resultados.0.alumnoVotado__primer_apellido }}</h3>
+                                <p class="lead">{{ max_votos }} votos</p>
+                                <small class="text-muted">ID: {{ resultados.0.alumnoVotado__numCuenta }}</small>
+                            </div>
+                        </div>
+                        {% endif %}
+                    {% endif %}
+                </div>
+            {% endif %}
+        </div>
+        
+        <div class="card-footer text-muted">
+            {% if votacion_activa %}
+                <i class="fas fa-hourglass-half"></i> Votación en curso (Termina {{ existe.fecha_fin|date:"d/m/Y H:i" }})
+            {% elif votacion_cerrada %}
+                <i class="fas fa-flag-checkered"></i> Votación finalizada el {{ existe.fecha_fin|date:"d/m/Y" }}
+            {% else %}
+                <i class="fas fa-clock"></i> Período: {{ existe.fecha_inicio|date:"d/m/Y" }} - {{ existe.fecha_fin|date:"d/m/Y" }}
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+{% if votacion_cerrada and not vista_ganadores %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const toggleBtn = document.getElementById('toggleGanadorBtn');
+    const todosResultados = document.getElementById('todosResultados');
+    const ganadorSection = document.getElementById('ganadorSection');
+    let mostrandoGanador = false;
+    
+    toggleBtn.addEventListener('click', function() {
+        mostrandoGanador = !mostrandoGanador;
+        
+        if (mostrandoGanador) {
+            todosResultados.style.display = 'none';
+            ganadorSection.style.display = 'block';
+            toggleBtn.innerHTML = '<i class="fas fa-list-ol"></i> Ver Todos';
+        } else {
+            todosResultados.style.display = 'block';
+            ganadorSection.style.display = 'none';
+            toggleBtn.innerHTML = '<i class="fas fa-trophy"></i> Ver Ganador{% if es_empate %}es{% endif %}';
+        }
+    });
+});
+</script>
+{% endif %}
+{% endblock %}

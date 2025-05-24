@@ -10,7 +10,7 @@
           {% if inscrito.numCuenta.tener.idPerfil.foto_perfil %}
             <img src="{{ inscrito.numCuenta.tener.idPerfil.foto_perfil.url }}" alt="Imagen Perfil"" class="img-fluid w-100 h-100" style="object-fit: cover;">
           {% else %}
-            <div class="w-100 h-100 bg-secondary d-flex align-items-center justify-content-center">
+            <div class="w-100 h-100 bg-secondary d-flex align-items-center justify-content-center>
               <i class="fas fa-user text-white" style="font-size: 3rem;"></i>
             </div>
           {% endif %}
@@ -24,9 +24,11 @@
         </h3>
         
         <a href={% url 'perfil' inscrito.numCuenta.numCuenta%} class="btn btn-primary" style="margin: 2%;">Perfil</a>
-        <form action="" method="POST">
-        {% csrf_token %}
-          <button type="submit" name="Votar" value={{inscrito.numCuenta.numCuenta}} class="btn btn-success" {{desabilitarVotacion}} style="margin: 2%;">Votar</button>
-        </form>
+        {% if numCuenta != request.user.numCuenta %}
+          <form action="" method="POST">
+            {% csrf_token %}
+            <button type="submit" name="Votar" value={{inscrito.numCuenta.numCuenta}} class="btn btn-success" {{desabilitarVotacion}} style="margin: 2%;">Votar</button>
+          </form>
+        {%endif%}
     </div>
 </div>

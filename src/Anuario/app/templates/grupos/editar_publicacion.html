@@ -1,0 +1,50 @@
+{% extends 'common/grupo_base.html' %}
+{% load widget_tweaks %}
+
+{% block title %}Editar publicacion{% endblock %}
+
+{% block grupo_content %}
+<div class="d-flex flex-column align-items-center py-4">
+    <h4 class="mb-4 text-center">Editar perfil</h4>
+    <form id="editar-publicacion-form" method="POST" class="w-100" style="max-width: 600px;">
+        {% csrf_token %}
+        <div class="mb-3 position-relative">
+            Agregar una descripción:
+            {{ form.descripcion }}
+            {% if form.descripcion.errors %}
+                <div class="text-danger small mt-1">{{ form.descripcion.errors.0 }}</div>
+            {% endif %}
+        </div>
+        <div class="mb-3 position-relative">
+            Agregar una imagen:
+            {{ form.imagen }}
+        </div>
+        <div class="row mt-4">
+            <div class="col-6 pe-1">
+                <button type="submit" class="btn btn-success w-100 rounded-pill py-2 fw-bold">Guardar cambios</button>
+            </div>
+            <div class="col-6 ps-1">
+                <a onclick="window.history.back()" class="btn btn-outline-secondary w-100 rounded-pill py-2 fw-bold">Cancelar</a>
+            </div>
+        </div>
+    </form>
+</div>
+<script>
+  document.getElementById('editar-publicacion-form').addEventListener('submit', function (e) {
+        e.preventDefault();  // Evita el envío automático
+
+        Swal.fire({
+            title: '¿Estás seguro?',
+            text: 'Estás a punto de editar el contenido de la publicacion.',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: 'Sí, continuar',
+            cancelButtonText: 'Cancelar'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                this.submit();  // Envía el formulario si se confirma
+            }
+        });
+    });
+</script>
+{% endblock %}

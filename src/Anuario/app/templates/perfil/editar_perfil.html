@@ -10,7 +10,7 @@ sepa en que vista se encuentra-->
             <h4>Editar Perfil</h4>
         </div>
         <div class="card-body">
-            <form method="post" enctype="multipart/form-data">
+            <form id="editar-usuario-form" method="post" enctype="multipart/form-data">
                 {% csrf_token %}
                 
                 <div class="mb-3">
@@ -34,17 +34,38 @@ sepa en que vista se encuentra-->
                     {% if marcos%}
                       {%for marco in marcos%}
                         <input class="form-check-input" type="radio" name="marco_foto" value="{{marco.premio.idMarco}}" style="margin-left:2%"> 
-                        <img src="{{marco.premio.marco.url}}" alt="Marco Perfil"" style="width:150px;">
+                        <img src="{{marco.premio.marco.url}}" alt="Marco Perfil"" style="width:150px;>
                       {% endfor %}
                     {% else %}
                       <p class="mb-1" style="padding: 1%"> No tienes marcos de perfil disponibles.</p>
                     {% endif %}
                 </div>
+
+
                 
-                <button type="submit" class="btn btn-primary">Guardar Cambios</button>
-                <a href="{% url 'perfil' usuario_id=request.user.numCuenta %}" class="btn btn-secondary">Cancelar</a>
+                <button class="btn btn-primary" type="submit">Guardar Cambios</button>
+                <button onclick="window.history.back()" class="btn btn-secondary">Cancelar</button>
             </form>
         </div>
     </div>
 </div>
+
+  <script>
+  document.getElementById('editar-usuario-form').addEventListener('submit', function (e) {
+        e.preventDefault();  // Evita el envío automático
+
+        Swal.fire({
+            title: '¿Estás seguro?',
+            text: 'Estás a punto de editar los datos del perfil.',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: 'Sí, continuar',
+            cancelButtonText: 'Cancelar'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                this.submit();  // Envía el formulario si se confirma
+            }
+        });
+    });
+  </script>
 {% endblock %}
