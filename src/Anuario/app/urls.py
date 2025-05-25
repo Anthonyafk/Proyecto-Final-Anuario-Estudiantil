@@ -1,14 +1,12 @@
 from django.urls import path, include
-from django.views.generic.base import TemplateView  # new
+from django.views.generic.base import TemplateView
 from . import views
 
 urlpatterns = [
     path("verNominacion/<str:idNominacion>", views.verNominacion, name="verNominacion"),
-    #path("551123012/", views.index, name="index"),
     path("perfil/<int:usuario_id>", views.verPerfil, name="perfil"),
     path("perfil/comentario/<int:idPerfil>", views.comentarioPerfil, name="add_comentario"),
     path("perfil/editar/<int:usuario_id>", views.editar_perfil, name="editar_perfil"),
-    # path("grupo/info/", views.detalle_grupo, name="grupo_info"),
     path('grupos/<int:grupo_id>/',views.detalle_grupo,name='detalle_grupo'), #ruta anterior pero dinamica
     path("grupos/<int:grupo_id>/nominaciones/", views.nominaciones, name="nominaciones"),
     path('grupos/<int:grupo_id>/integrantes/', views.integrantes, name='integrantes'),
@@ -31,7 +29,6 @@ urlpatterns = [
     path('grupos/<int:grupo_id>/nominaciones/editar/', views.editar_duracion_nominaciones, name='editar_duracion_nominaciones'),
     path('nominaciones/<int:idNominacion>/resultados/', views.resultados_votacion, name='resultados_votacion'),
     path('grupos/<str:codigo_grupo>/ganadores/', views.resultados_votacion, name='ver_ganadores'),
-    #path("", TemplateView.as_view(template_name="home.html"), name="home")  # new
     path("",views.home, name="home")
 ]
 

@@ -178,7 +178,7 @@ class Nominacion(models.Model):
 class Marco(models.Model):
     idMarco = models.AutoField(primary_key=True)
     marco = models.ImageField(upload_to='marco/', blank=True)
-    
+
 class Ganar(models.Model):
     idNominacion = models.ForeignKey(Nominacion, on_delete=models.CASCADE)
     numCuenta = models.ForeignKey(Usuario, on_delete=models.CASCADE)

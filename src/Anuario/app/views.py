@@ -54,7 +54,6 @@ def signup(request):
 def home(request):
     grupos = []
     usuario = request.user
-    print(usuario)
     try:
         if usuario.is_superuser:
             grupos_u = Gestionar.objects.filter(numCuenta=usuario)
@@ -63,9 +62,7 @@ def home(request):
     except:
         grupos_u = []
     for g in grupos_u:
-        print(f"g.codigo: {g.codigo}")
         grupos.append(g.codigo)
-    print(grupos)
     return render(request, "home.html", { 'grupos' : grupos })
 
 #Esta funcion esta disponible sii existe al menos un grupo en la vista home
@@ -144,7 +141,6 @@ def verNominacion(request, idNominacion):
                     inscritos = inscritos.filter(numCuenta__nombre__icontains = nombre) | inscritos.filter(numCuenta__primer_apellido__icontains = nombre) | inscritos.filter(numCuenta__segundo_apellido__icontains = nombre)
             if(not nombreCompleto):
                 dato = 'Busqueda vacia.'
-    print(inscritos)
     return render(request, "nomination/nomination.html", {
         'nominacion':nominacion,
         'inscritos':inscritos,
@@ -198,7 +194,7 @@ def editar_perfil(request, usuario_id):
                 marcoUnoAUno = MarcoFoto.objects.filter(idPerfil=perfil)
                 if marcoUnoAUno.exists():
                     marcoUnoAUno.delete()
-                marcofoto = MarcoFoto(idPerfil=perfil, marco_foto=marco) 
+                marcofoto = MarcoFoto(idPerfil=perfil, marco_foto=marco)
                 marcofoto.save()
             form.save()
             sweetify.success(
@@ -300,7 +296,6 @@ def revisar_integrantes(request, grupo_id):
 # Función para ver los integrantes de un grupo
 def integrantes(request, grupo_id):
     grupo, form, integrantes_qs, marcos = revisar_integrantes(request, grupo_id)
-    print(integrantes_qs)
     return render(request, 'admin/admin_alumnos.html', {
         'grupo': grupo,
         'form': form,
@@ -473,7 +468,6 @@ def expulsar_alumno(request, grupo_id, numCuenta):
 @staff_member_required
 def ad_alumnos(request,grupo_id):
     grupo, form, integrantes_qs, marcos = revisar_integrantes(request, grupo_id)
-    print(integrantes_qs)
     return render(request, 'admin/admin_alumnos.html', {
         'grupo': grupo,
         'form': form,
