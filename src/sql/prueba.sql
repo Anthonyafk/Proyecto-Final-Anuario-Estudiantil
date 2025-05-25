@@ -24,7 +24,7 @@ VALUES (114007889, 1);
 INSERT INTO app_ganar ("premio_id", "activa", "idNominacion_id", "numCuenta_id")
 VALUES (1, true, 4, 114007889);
 
-INSERT INTO app_ganar ("premio_", "activa", "idNominacion_id", "numCuenta_id")
+INSERT INTO app_ganar ("premio_id", "activa", "idNominacion_id", "numCuenta_id")
 VALUES (2, true, 2, 114007889);
 
 -- Comentario
