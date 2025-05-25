@@ -9,11 +9,17 @@
 
 ### ⚙️ Activación de entorno ⚙️
 
-Esto principalmente es para que todos tengamos las mismas dependecias y que cada uno no tenga que ir descargando una a una las dependencias que tiene el proyecto xd.
+Crea un entorno y actívalo:
 
 ```bash
 conda env create --name `nombre del env`
 conda activate `nombre del env`
+```
+
+A la altura de _environment.yml_ descarga las dependecias necesarias para este proyecto:
+
+```bash
+conda env update --file environment.yml --prune
 ```
 
 *En dado caso de que necesites eliminar el entorno:*
@@ -24,17 +30,17 @@ conda env remove --name `nombre del env`
 
 ## 🐳 Base de datos 
 
-Si ya tienes PostgreSQL, puedes crear una base llamada `anuario` o con el nombre que prefieras y ajusta las credenciales que tienes de tu BD en `settings.py` dentro de la carpeta `anuario`. Tambien esta esta otra guia para mas información: [Guía para conectar manualmente BD SQL](Guia%20para%20conectar%20manualmente%20BD%20sql.md)
+Si ya tienes PostgreSQL, debes crear una base de datos llamada `anuario` (o con el nombre que prefieras) y ajusta las credenciales que tienes de la base de datos en `settings.py` dentro de la carpeta `anuario`. Tambien está esta otra guia para más información: [Guía para conectar manualmente BD SQL](Guia%20para%20conectar%20manualmente%20BD%20sql.md)
 
 ![Sección a modificar para la BD local](image.png)
 
-**Es importante asegurarse que el contenedor de la BD este activo antes de ejecutar el servidor**
+**IMPORTANTE: Asegúrate que el contenedor de la base de datos está activo antes de ejecutar el servidor**
 
-##  Guia rapida para hacer las migraciones hacia nuestra BD de postgresql 
+##  Migraciones hacia la Base de Datos de postgresql 
 
-Estando en la misma altura que `manage.py` el cual se encuentra en `src/Anuario/manage.py`
+Estando a la misma altura que `manage.py` el cual se encuentra en `src/Anuario/manage.py`
 
-1. Genera y aplica migraciones:
+Genera y aplica migraciones:
 
    ```bash
    python manage.py makemigrations
@@ -62,3 +68,4 @@ Abre luego [http://127.0.0.1:8000/](http://127.0.0.1:8000/) en tu navegador.
 * La estructura de triggers y modelos se encuentra en `app/models.py`.
 
 ---
+
