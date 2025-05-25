@@ -141,6 +141,7 @@ def verPerfil(request, usuario_id):
             biografia=""
         )
         Tener.objects.create(numCuenta=usuario_obj, idPerfil=perfil)
+        marco = MarcoFoto.objects.filter(idPerfil=perfil)
     datos = {
         'perfil': perfil,
         'usuario': usuario_obj,
