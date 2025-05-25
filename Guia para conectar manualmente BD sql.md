@@ -5,7 +5,7 @@
 ```bash
 docker ps -a
 ```
-Esto nos muestra los contenedores en ejecución y detenidos. Si ya tenemos un contenedor de PostgreSQL creado, lo podemos localizar con su `CONTAINER ID` o `NAME` :v.
+Esto nos muestra los contenedores en ejecución y detenidos. Si ya tenemos un contenedor de PostgreSQL creado, lo podemos localizar con su `CONTAINER ID` o `NAME`.
 
 
 ### 2. Iniciar o crear un contenedor con PostgreSQL (si no tenemos uno xd)

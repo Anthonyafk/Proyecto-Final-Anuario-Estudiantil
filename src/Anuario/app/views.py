@@ -6,12 +6,10 @@ from django.contrib import messages
 from .models import Usuario, Grupo, Comentario, Publicacion, Nominacion, Perfil, Tener, Pertenecer, Postular, Votar, MarcoFoto, Ganar, Comentario, Gestionar, Poseer, Marco, Existe, Count
 from .forms import UsuarioRegistroForm, UsuarioBusquedaNominacion, PerfilForm, DejarComentario, GroupJoinForm, GrupoForm, PublicacionForm, BusquedaGenericaForm, EditarPublicacionForm, EditarDuracionNominacionesForm
 from django.contrib.auth import authenticate, login
-from django.db import IntegrityError
-from django.contrib.auth.decorators import login_required, user_passes_test
+from django.contrib.auth.decorators import login_required
 from django.contrib.admin.views.decorators import staff_member_required
 from datetime import date
 from datetime import datetime
-from django.shortcuts import HttpResponse #prueba
 from django.utils import timezone
 
 def index(request):

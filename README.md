@@ -30,7 +30,7 @@ conda env remove --name `nombre del env`
 
 ## 🐳 Base de datos 
 
-Si ya tienes PostgreSQL, debes crear una base de datos llamada `anuario` (o con el nombre que prefieras) y ajustar las credenciales que tiene tu base de datos en `settings.py` dentro de la carpeta `anuario`. Tambien está esta otra guia para más información: [Guía para conectar manualmente BD SQL](Guia%20para%20conectar%20manualmente%20BD%20sql.md)
+Si ya tienes PostgreSQL + Docker, debes crear una base de datos llamada `anuario` (o con el nombre que prefieras) y ajustar las credenciales que tiene tu base de datos en `settings.py` dentro de la carpeta `anuario`. Tambien está esta otra guia para más información: [Guía para conectar manualmente BD SQL](Guia%20para%20conectar%20manualmente%20BD%20sql.md)
 
 ![Sección a modificar para la Base de Datos local](image.png)
 
