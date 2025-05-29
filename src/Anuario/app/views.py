@@ -157,7 +157,8 @@ def verPerfil(request, usuario_id):
         relacion_tener = Tener.objects.get(numCuenta=usuario_obj)
         perfil = relacion_tener.idPerfil
         marco = MarcoFoto.objects.filter(idPerfil=perfil)
-        comentarios = Comentario.objects.filter(idPerfil=perfil).order_by('-fecha_creacion', '-hora_creacion')
+        comentarios = Comentario.objects.filter(idPerfil=perfil)
+        comentarios = comentarios.exclude(numCuenta=usuario_id).order_by('-fecha_creacion', '-hora_creacion')
     except Tener.DoesNotExist:
         # Si no existe el perfil, creamos uno vacío
         perfil = Perfil.objects.create(
@@ -168,6 +169,7 @@ def verPerfil(request, usuario_id):
         Tener.objects.create(numCuenta=usuario_obj, idPerfil=perfil)
         marco = MarcoFoto.objects.filter(idPerfil=perfil)
         comentarios = Comentario.objects.filter(idPerfil=perfil)
+        comentarios = comentarios.exclude(numCuenta=usuario_id)
     datos = {
         'perfil': perfil,
         'usuario': usuario_obj,
