@@ -157,7 +157,7 @@ def verPerfil(request, usuario_id):
         relacion_tener = Tener.objects.get(numCuenta=usuario_obj)
         perfil = relacion_tener.idPerfil
         marco = MarcoFoto.objects.filter(idPerfil=perfil)
-        comentarios = Comentario.objects.filter(idPerfil=perfil)
+        comentarios = Comentario.objects.filter(idPerfil=perfil).order_by('-fecha_creacion', '-hora_creacion')
     except Tener.DoesNotExist:
         # Si no existe el perfil, creamos uno vacío
         perfil = Perfil.objects.create(
@@ -308,7 +308,7 @@ def comentarios(request, grupo_id, publicacion_id):
     poseer = Poseer.objects.filter(idPublicacion=publicacion)
     comentarios = Comentario.objects.filter(
         idComentario__in=poseer.values_list('idComentario', flat=True)
-    ).order_by('-fecha_creacion', '-hora_creacion')
+    ).order_by('fecha_creacion', 'hora_creacion')
 
     return render(request, 'grupos/comentarios.html', {
         'grupo' : grupo,
