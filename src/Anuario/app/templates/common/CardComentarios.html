@@ -3,8 +3,8 @@
   <div class="d-flex p-3" style="box-sizing: border-box;  display: flex; align-items: center;">
     <!-- Foto de Perfil -->
     <div class="position-absolute">
-      {% if comentario.numCuenta.tener.idPerfil.marcofoto_set.first.marco_foto %}
-        <img src="{{comentario.numCuenta.tener.idPerfil.marcofoto_set.first.marco_foto.marco.url}}" alt="Marco"  style="position:absolute; width:50px;">
+      {% if comentario.numCuenta.tener.idPerfil.marcofoto.marco_foto %}
+        <img src="{{comentario.numCuenta.tener.idPerfil.marcofoto.marco_foto.marco.url}}" alt="Marco"  style="position:absolute; width:50px;">
       {% endif %}
       <div class="border border-4 border-white rounded-circle" style="width: 50px; height: 50px; overflow: hidden;">
         {% if comentario.numCuenta.tener.idPerfil.foto_perfil %}

@@ -34,13 +34,12 @@ sepa en que vista se encuentra-->
                     {% if marcos%}
                       {%for marco in marcos%}
                         <input class="form-check-input" type="radio" name="marco_foto" value="{{marco.premio.idMarco}}" style="margin-left:2%"> 
-                        <img src="{{marco.premio.marco.url}}" alt="Marco Perfil"" style="width:150px;>
+                        <img src="{{marco.premio.marco.url}}" alt="Marco Perfil" style="width:150px;">
                       {% endfor %}
                     {% else %}
                       <p class="mb-1" style="padding: 1%"> No tienes marcos de perfil disponibles.</p>
                     {% endif %}
                 </div>
-
 
                 
                 <button class="btn btn-primary" type="submit">Guardar Cambios</button>

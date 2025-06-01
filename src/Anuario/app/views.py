@@ -11,6 +11,7 @@ from django.contrib.admin.views.decorators import staff_member_required
 from datetime import date
 from datetime import datetime
 from django.utils import timezone
+import random
 
 def index(request):
     contextosinpretexto = {
@@ -634,6 +635,38 @@ def editar_duracion_nominaciones(request, grupo_id):
     if request.method == 'POST':
         form = EditarDuracionNominacionesForm(request.POST, instance=nominacion_referencia)
         if form.is_valid():
+            # Obtener todas las nominaciones del grupo
+            nominaciones = Nominacion.objects.filter(existe__codigo=grupo)
+
+            # Eliminar marcos
+            for nominacion in nominaciones:
+                # Quitar marcos de ganadores
+                ganadores = Ganar.objects.filter(idNominacion=nominacion)
+                for ganador in ganadores:
+                    try:
+                        MarcoFoto.objects.filter(
+                            idPerfil=ganador.numCuenta.tener.idPerfil,
+                            marco_foto=ganador.premio
+                        ).delete()
+
+                        ganador.delete()
+                    except Exception as e:
+                        print(f"Error eliminando marco: {e}")
+                        continue
+
+            # Reiniciar votos 
+            if form.cleaned_data['fecha_inicio'] <= timezone.now() <= form.cleaned_data['fecha_fin']:
+                for nominacion in nominaciones:
+                    # Reiniciar votos y postulaciones
+                    Votar.objects.filter(idNominacion=nominacion).delete()
+                    Postular.objects.filter(idNominacion=nominacion).delete()
+                    
+                    # Activar nominación si estaba inactiva
+                    if not nominacion.activa:
+                        nominacion.activa = True
+                        nominacion.save()
+
+
             # Actualiza todas las nominaciones del grupo con la misma duración
             nominaciones_grupo.update(
                 fecha_inicio=form.cleaned_data['fecha_inicio'],
@@ -674,6 +707,11 @@ def resultados_votacion(request, idNominacion=None, codigo_grupo=None):
                 if resultados:
                     max_votos = resultados[0]['total_votos']
                     ganadores = [r for r in resultados if r['total_votos'] == max_votos]
+                    print(ganadores)
+                    # Asignar marcos a los ganadores
+                    for ganador in ganadores:
+                        alumno = Usuario.objects.get(numCuenta=ganador['alumnoVotado__numCuenta'])
+                        asignar_marco_ganador(alumno, nominacion)
 
                     categorias_con_ganadores.append({
                         'categoria': nominacion.categoria,
@@ -709,11 +747,16 @@ def resultados_votacion(request, idNominacion=None, codigo_grupo=None):
     # Determina ganador(es)
     ganadores = []
     max_votos = 0
-
+    
     if resultados:
         max_votos = resultados[0]['total_votos']
         ganadores = [r for r in resultados if r['total_votos'] == max_votos]
-
+        if votacion_cerrada:
+            # Asignar marcos a los ganadores
+            for ganador in ganadores:
+                alumno = Usuario.objects.get(numCuenta=ganador['alumnoVotado__numCuenta'])
+                asignar_marco_ganador(alumno, nominacion)
+    
     return render(request, 'nomination/resultados_individuales.html', {
         'nominacion': nominacion,
         'resultados': resultados,
@@ -724,5 +767,49 @@ def resultados_votacion(request, idNominacion=None, codigo_grupo=None):
         'es_empate': len(ganadores) > 1,
         'max_votos': max_votos,
         'no_hay_nominaciones_activas': not votacion_activa and not votacion_cerrada,
-        'vista_ganadores': False  # Importante para el template
+        'vista_ganadores': False  
     })
+
+# Función para asignar un marco al ganador de una nominación
+def asignar_marco_ganador(alumno, nominacion):
+    # Verificar si el alumno ya tiene un marco asignado
+    marco_existente = MarcoFoto.objects.filter(idPerfil=alumno.tener.idPerfil).first()
+    
+    # Obtener marcos disponibles
+    marcos_disponibles = Marco.objects.all()
+    
+    if not marcos_disponibles.exists():
+        return None
+        
+    # Si no tiene marco de alguna categoría pasada le asigna uno 
+    marco_asignar = nominacion.premio
+    
+    # Si ya tiene un marco no hacemos nada
+    if marco_existente and not marco_existente.marco_foto.es_multiple:
+        marco = marco_existente
+        marco.marco_foto = marco_asignar
+        marco.save()
+    
+    ganar_existente = Ganar.objects.filter(numCuenta=alumno)
+    ganar_existente = ganar_existente.filter(idNominacion=nominacion)
+    
+    
+    if ganar_existente:
+        ganar = ganar_existente.first()
+        ganar.premio=marco_asignar
+        ganar.save()
+    else:
+        # para relacionar ganar con el marco
+        Ganar.objects.create(
+            idNominacion=nominacion,
+            numCuenta=alumno,
+            premio=marco_asignar
+        )
+    
+    # Actualizar el en el perfil
+    marco_foto, created = MarcoFoto.objects.update_or_create(
+        idPerfil=alumno.tener.idPerfil,
+        defaults={'marco_foto': marco_asignar}
+    )
+    
+    return marco_foto
