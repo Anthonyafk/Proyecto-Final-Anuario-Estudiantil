@@ -151,7 +151,7 @@ class Nominacion(models.Model):
     activa = models.BooleanField(default=True)
     mostrar_resultados = models.BooleanField(default=True)
 
-    #Musetra el ganador de la categoría cerrada
+    #Muestra el ganador de la categoría cerrada
     def ganador(self):
         votos = Votar.objects.filter(idNominacion=self)
         if votos.exists():
@@ -178,6 +178,11 @@ class Nominacion(models.Model):
 class Marco(models.Model):
     idMarco = models.AutoField(primary_key=True)
     marco = models.ImageField(upload_to='marco/', blank=True)
+    #si gana mas de una categoría solo se asigna un marco 
+    es_multiple = models.BooleanField(default=False)
+
+    def __str__(self):
+        return f"Marco {self.idMarco}"
 
 class Ganar(models.Model):
     idNominacion = models.ForeignKey(Nominacion, on_delete=models.CASCADE)
@@ -268,8 +273,9 @@ class Postular(models.Model):
         unique_together = (('numCuenta', 'idNominacion'),)
 
 class MarcoFoto(models.Model):
-    idPerfil = models.ForeignKey(Perfil, on_delete=models.CASCADE)
+    idPerfil = models.OneToOneField(Perfil, on_delete=models.CASCADE)
     marco_foto = models.ForeignKey(Marco, on_delete=models.CASCADE)
 
     class Meta:
         unique_together = (('idPerfil', 'marco_foto'),)
+        
