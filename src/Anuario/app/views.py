@@ -707,7 +707,7 @@ def resultados_votacion(request, idNominacion=None, codigo_grupo=None):
                 if resultados:
                     max_votos = resultados[0]['total_votos']
                     ganadores = [r for r in resultados if r['total_votos'] == max_votos]
-
+                    print(ganadores)
                     # Asignar marcos a los ganadores
                     for ganador in ganadores:
                         alumno = Usuario.objects.get(numCuenta=ganador['alumnoVotado__numCuenta'])
@@ -747,11 +747,16 @@ def resultados_votacion(request, idNominacion=None, codigo_grupo=None):
     # Determina ganador(es)
     ganadores = []
     max_votos = 0
-
+    
     if resultados:
         max_votos = resultados[0]['total_votos']
         ganadores = [r for r in resultados if r['total_votos'] == max_votos]
-
+        if votacion_cerrada:
+            # Asignar marcos a los ganadores
+            for ganador in ganadores:
+                alumno = Usuario.objects.get(numCuenta=ganador['alumnoVotado__numCuenta'])
+                asignar_marco_ganador(alumno, nominacion)
+    
     return render(request, 'nomination/resultados_individuales.html', {
         'nominacion': nominacion,
         'resultados': resultados,
@@ -770,25 +775,36 @@ def asignar_marco_ganador(alumno, nominacion):
     # Verificar si el alumno ya tiene un marco asignado
     marco_existente = MarcoFoto.objects.filter(idPerfil=alumno.tener.idPerfil).first()
     
-    # Si ya tiene un marco no hacemos nada
-    if marco_existente and not marco_existente.marco_foto.es_multiple:
-        return marco_existente
-    
     # Obtener marcos disponibles
     marcos_disponibles = Marco.objects.all()
     
     if not marcos_disponibles.exists():
         return None
-    
+        
     # Si no tiene marco de alguna categoría pasada le asigna uno 
     marco_asignar = random.choice(marcos_disponibles)
     
-    # para relacionar ganar con el marco
-    Ganar.objects.create(
-        idNominacion=nominacion,
-        numCuenta=alumno,
-        premio=marco_asignar
-    )
+    # Si ya tiene un marco no hacemos nada
+    if marco_existente and not marco_existente.marco_foto.es_multiple:
+        marco = marco_existente
+        marco.marco_foto = marco_asignar
+        marco.save()
+    
+    ganar_existente = Ganar.objects.filter(numCuenta=alumno)
+    ganar_existente = ganar_existente.filter(idNominacion=nominacion)
+    
+    
+    if ganar_existente:
+        ganar = ganar_existente.first()
+        ganar.premio=marco_asignar
+        ganar.save()
+    else:
+        # para relacionar ganar con el marco
+        Ganar.objects.create(
+            idNominacion=nominacion,
+            numCuenta=alumno,
+            premio=marco_asignar
+        )
     
     # Actualizar el en el perfil
     marco_foto, created = MarcoFoto.objects.update_or_create(
