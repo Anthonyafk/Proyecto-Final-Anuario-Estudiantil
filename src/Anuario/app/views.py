@@ -782,7 +782,7 @@ def asignar_marco_ganador(alumno, nominacion):
         return None
         
     # Si no tiene marco de alguna categoría pasada le asigna uno 
-    marco_asignar = random.choice(marcos_disponibles)
+    marco_asignar = nominacion.premio
     
     # Si ya tiene un marco no hacemos nada
     if marco_existente and not marco_existente.marco_foto.es_multiple:
