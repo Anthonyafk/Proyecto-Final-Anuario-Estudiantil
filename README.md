@@ -6,10 +6,10 @@
 
 Sugerimos seguir los siguientes pasos:
 
-1. Lee la documentación del proyecto 'Especificacón de requisitos de software: NentBook' haciendo especial énfasis en el apéndice A 'Manual de usuario'. Familiarizate con la aplicación.
+1. Revisa la documentación del proyecto _Especificación de Requisitos de Software: NentBook_, con especial énfasis en el Apéndice A (Manual de Usuario). Es importante que te familiarices con la aplicación.
 
 
-2. Lee la sección 'Acceso a la apliación' de este README y sigue las instrucciones a excepción de la ejecución del servidor.
+2. Lee la sección _Acceso a la apliación_ de este README y sigue las instrucciones a excepción de la ejecución del servidor.
 
 
 3. Crea un usuario administrador como se indica en el manual de usuario.
@@ -26,7 +26,7 @@ Sugerimos seguir los siguientes pasos:
 	- Recarga el servidor de NentBook
 
 
-5. Ya puedes disfutar de NentBook como administrador, ahora puedes crear uuarios sin privilegios directamente desde el servidor.   
+5. **NentBook** ya está disponible para su uso como administrador. Ahora es posible crear usuarios sin privilegios directamente desde el servidor   
 
 
 
