@@ -2,7 +2,37 @@
 
 ---
 
-## Algunos prerequisitos:
+## 1. Para una mejor experiencia...
+
+Sugerimos seguir los siguientes pasos:
+
+1. Lee la documentación del proyecto 'Especificacón de requisitos de software: NentBook' haciendo especial énfasis en el apéndice A 'Manual de usuario'. Familiarizate con la aplicación.
+
+
+2. Lee la sección 'Acceso a la apliación' de este README y sigue las instrucciones a excepción de la ejecución del servidor.
+
+
+3. Crea un usuario administrador como se indica en el manual de usuario.
+
+
+4. Ejecuta el servido y accede con las credenciales del administrador que recién creaste.
+
+
+5. Crea uno o más grupos dentro de la aplicación.
+
+
+4. Lee el README que se encuentra en la carpeta src/sql/ 
+	- En la base de datos que usaste para este proyecto carga los datos obligatorios del DML.sql
+	- Recarga el servidor de NentBook
+
+
+5. Ya puedes disfutar de NentBook como administrador, ahora puedes crear uuarios sin privilegios directamente desde el servidor.   
+
+
+
+## 2. Acceso a la apliación
+
+### Algunos prerequisitos:
 
 * **Conda** (o Miniconda)
 * **Docker** (para levantar la BD de PostgreSQL)
