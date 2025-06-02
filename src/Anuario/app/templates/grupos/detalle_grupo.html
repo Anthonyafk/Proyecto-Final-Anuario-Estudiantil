@@ -1,0 +1,63 @@
+{% extends 'common/grupo_base.html' %}
+{% load custom_tags %}
+<!--Muestra en la parte del enlace una pequeña historia para que el usuario
+sepa en que vista se encuentra-->
+{% block title %}Info Grupos{% endblock %}
+
+{% block grupo_content %}
+
+{% if messages %}  <!--Bloque para admitir mensajes de Django-->
+    <div class="container mt-3">
+        {% for message in messages %}
+            <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Cerrar"></button>
+            </div>
+        {% endfor %}
+    </div>
+{% endif %}
+
+<div class="container-fluid px-4">
+    <!-- Nombre del grupo -->
+    <div class="card shadow-sm mb-4 border-0 bg-secondary bg-opacity-25">  
+        <div class="card-body"> 
+            <h1 class="display-5 text-dark">{{grupo.nombre}}</h1>
+            <div class="d-flex justify-content-between align-items-center mb-3">
+            <div>
+                {% if user.is_staff %}
+                    <a href="{% url 'editar_grupo' grupo_id=grupo.codigo %}" class="btn btn-warning me-3">Editar grupo</a>
+                {% endif %}
+                <a href="{% url 'publicar' grupo_id=grupo.codigo %}" class="btn btn-success">Publicar</a>
+            </div>
+            <div class="text-dark">
+                {% if user.is_staff %}
+                    <strong>Código:</strong> {{grupo.codigo_acceso}}
+                {% endif %}
+            </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Info grupo-->
+    <div class="card shadow mb-4">
+        <div class="card-body"> 
+            <div class="p-2 rounded bg-light" style="height: 4rem;">
+                <p class="mb-0">
+                 {{ grupo.descripcion|default:"Sin descripción." }} <!-- Para mostrar la info del grupo q le ponga el admin-->
+                </p>
+            </div>
+        </div>
+        {% if publicaciones %}
+            {% for publicacion in publicaciones %}
+                <div class="container">
+                    {% with form=forms|get_item:publicacion.idPublicacion %}
+                        {% include 'common/CardPublicacion.html' with publicacion=publicacion form=form %}
+                    {% endwith %}
+                </div>
+            {% endfor %}
+        {% else %}
+            <h4 class="py-2 text-center">Aún no hay publicaciones en este grupo.</h4>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,15 @@
+[
+    {
+        "model": "app.Usuario",
+        "pk": 320124516 ,
+        "fields": {
+            "nombre": "Joshua",
+            "primer_apellido": "Juárez",
+            "segundo_apellido": "Cruz",
+            "correoE": "joshua-j-c@ciencias.unam.mx",
+            "nombre_usuario": "",
+            "contraseña": "",
+            "esAdmin": true
+        }
+    }
+]

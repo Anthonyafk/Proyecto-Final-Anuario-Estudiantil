@@ -1,0 +1,39 @@
+{# templates/admin/admin_publicaciones.html #}
+{% extends 'admin/admin_base.html' %}
+
+{% block admin_title %}Administrar Publicaciones{% endblock %}
+{% block header %}Publicaciones{% endblock %}
+
+{% block admin_content %}
+{% if publicaciones %}
+  <table class="table">
+    <thead>
+      <tr>
+        <th>Usuario</th>
+        <th>Fecha de publicación</th>
+        <th class="text-end">Acciones</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for pub in publicaciones %}
+        <tr>
+          <td>{{ pub.numCuenta }}</td>
+          <td>Publicado {{ pub.fecha_creacion|date:"d/m/Y" }} - {{ pub.hora_creacion|time:"H:i:s" }}</td>
+          <td class="text-end">
+            <div class="d-inline-flex gap-2">
+              <a class="btn btn-outline-dark" href="{% url 'editar_publicacion' grupo_id=grupo.codigo publicacion_id=pub.idPublicacion %}">
+                <i class="fas fa-pencil me-1"></i> Editar
+              </a>
+              <button class="btn btn-danger" onclick="confirmarEliminacion('{% url 'eliminar_publicacion' grupo_id=grupo.codigo publicacion_id=pub.idPublicacion %}')" >
+                <i class="fas fa-trash-alt me-1"></i> Eliminar
+              </button>
+            </div>
+          </td>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+{% else %}
+  <h4 class="py-4 text-center">No hay publicaciones registradas</h4>
+{% endif %}
+{% endblock %}

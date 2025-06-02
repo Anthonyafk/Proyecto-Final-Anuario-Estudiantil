@@ -1,0 +1,100 @@
+<!--html para la vista perfil-->
+{% extends 'base.html' %}
+<!--Muestra en la parte del enlace una pequeña historia para que el usuario
+sepa en que vista se encuentra-->
+{% block title %}Perfil de {{ usuario.nombre_usuario }}{% endblock %}
+
+{% block content %}
+<div class="flex-grow-1">
+  {% if user.is_authenticated %}
+    <div class="container mt-4">
+      <!-- Foto de Portada -->
+      <div class="card mb-4 shadow">
+        <div class="card-header p-0" style="height: 250px; overflow: hidden;">
+          {% if perfil.foto_portada %}
+          <!--Si hay una imagen la acomoda en el apartado correspondiente-->
+            <img src="{{ perfil.foto_portada.url }}" alt="Portada" class="img-fluid w-100 h-100" 
+            style="object-fit: cover;">
+          {% else %}
+          <!--Si el usuario no tiene una imagen se pone por defecto un color con tonalidades
+          que aluden a la empresa-->
+          <div class="w-100 h-100" style="background: 
+                                   linear-gradient(180deg, rgba(101, 159, 199, 1) 0%, rgba(80, 224, 134, 1) 100%);"></div>
+          {% endif %}
+        </div>
+        
+        <!-- Información del usuario -->
+        <div class="card-body position-relative pt-5">  
+          <!--  foto con marco y centrar foto de perfil -->
+          <div class="position-absolute top-0 start-50 translate-middle" style="top: -75px;">
+            <div class="position-relative d-flex align-items-center justify-content-center" style="width: 170px; height: 170px;">
+              {% if marco.marco_foto %}
+                <!-- Marco -->
+                <img src="{{ marco.marco_foto.marco.url }}" class="position-absolute top-0 start-0 w-100 h-100 rounded-circle" alt="Marco">
+              {% endif %}
+              
+              <!-- Foto de perfil -->
+              <div class="border border-4 border-white rounded-circle" style="width: 150px; height: 150px; overflow: hidden;"
+                   style="width: 150px; height: 150px;">
+                <!--Si tiene foto la muestra, en caso contrario muestra ícono -->
+                {% if perfil.foto_perfil %}
+                  <img src="{{ perfil.foto_perfil.url }}" alt="Perfil" class="img-fluid w-100 h-100" style="object-fit: cover;">
+                 {% else %}
+                   <div class="w-100 h-100 bg-secondary d-flex align-items-center justify-content-center">
+                     <i class="fas fa-user text-white" style="font-size: 3rem;"></i>
+                   </div>
+                {% endif %}
+              </div>
+            </div>
+          </div>
+          
+            <!-- Nombre de usuario -->
+       <div class="text-center mt-5">  <!-- mt-5 para espacio después de la foto -->
+         <h2 class="mb-1">{{ usuario.nombre }} {{ usuario.primer_apellido }} {{ usuario.segundo_apellido }}</h2>
+         <!-- Usuario -->
+         <h4 class="mb-1" style="padding: 1%">{{ usuario.nombre_usuario}}</h4>
+       <!--Verifica si el que está viendo el perfil es el dueño de la cuenta, de ser 
+       así muestra el botón de "editar perfil"-->
+    {% if request.user.numCuenta == usuario.numCuenta or request.user.is_superuser%}
+      <a href="{% url 'editar_perfil' usuario_id=usuario.numCuenta %}" class="btn btn-primary">Editar Perfil</a>
+    {% endif %}
+    
+  </div>
+</div>
+      
+      <!-- Biografía -->
+       <div class="card">
+        <div class="card-body">
+          {% if perfil.biografia %}
+          <p class="text-center mb-0">{{ perfil.biografia }}</p>
+          {% else %}
+            <p class="text-center mb-0">Este usuario no ha escrito una biografía aún.</p>
+          {% endif %}
+       </div>
+      </div>
+      
+         </div>  
+         <!-- Sección de Dedicatorias -->
+         <div>
+           <!-- Botón añadir comentario -->
+           {% if request.user.numCuenta != usuario.numCuenta %}
+           <div style="display: flex; margin-bottom:2%;">
+            <a href="{% url 'add_comentario' perfil.idPerfil %}" class="btn btn-primary" style="margin-left: auto;">Añadir Comentario</a>
+           </div>
+           {% endif %}
+            <!-- Comentarios -->
+            {% for comentario in comentarios %}
+              {% include 'common/CardComentarios.html' %}
+            {% endfor%}
+         </div>
+  {% else %}
+    <div class="container mt-5">
+      <div class="alert alert-warning text-center">
+        <p>Debes iniciar sesión para ver los perfiles</p>
+        <a href="{% url 'login' %}" class="btn btn-primary">Iniciar sesión</a>
+      </div>
+    </div>
+  {% endif %}
+</div>  
+</div>
+{% endblock %}

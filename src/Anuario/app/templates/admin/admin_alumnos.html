@@ -1,0 +1,20 @@
+{# templates/admin/admin_alumnos.html #}
+{% extends 'admin/admin_base.html' %}
+
+{% load static %}
+{% load widget_tweaks %}
+
+{% block admin_title %}Administrar Alumnos{% endblock %}
+{% block header %}Alumnos{% endblock %}
+
+{% block admin_content %}
+  {% if integrantes %}
+    {% for alumno in integrantes %}
+      {% include 'common/CardIntegrante.html' with integrante=alumno%}
+    {% endfor %}
+
+  {% else %}
+  <h4 class="py-4 text-center">No hay alumnos registrados</h4>
+  {% endif %}
+{% endblock %}
+
